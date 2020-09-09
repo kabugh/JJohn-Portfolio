@@ -1,31 +1,56 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
+    <!-- <LoadingOverlay /> -->
+    <TheNavbar />
+    <transition name="navOverlay">
+      <NavOverlay v-if="isNavOpen" />
+    </transition>
+    <div class="overlay__mask" :class="{ visible: isNavOpen }"></div>
+    <keep-alive include="Home">
+      <router-view />
+    </keep-alive>
+    <!-- <TheFooter
+      data-aos="fade-in"
+      data-aos-delay="400"
+      data-aos-offset="-1000"
+    /> -->
   </div>
 </template>
+<script lang="ts">
+import { Vue, Component } from "vue-property-decorator";
+// import LoadingOverlay from "./components/LoadingOverlay.vue";
+import TheNavbar from "./components/navigation/TheNavbar.vue";
+import NavOverlay from "./components/navigation/NavOverlay.vue";
+// import TheFooter from "./components/TheFooter.vue";
+
+@Component({
+  components: { TheNavbar, NavOverlay }
+})
+export default class App extends Vue {
+  get isNavOpen(): boolean {
+    return this.$store.getters.isNavOpen;
+  }
+}
+</script>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
+@import "@/assets/scss/global.scss";
+@media (min-width: 1280px) and (min-height: 500px) {
+  .overlay__mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 10;
+    transition: background-color 0.3s ease-in-out 0.3s,
+      opacity 0.3s ease-in-out 0.3s;
+    &.visible {
+      opacity: 1;
+      visibility: visible;
+      background-color: rgba(0, 0, 0, 0.8);
     }
   }
 }
