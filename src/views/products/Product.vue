@@ -39,7 +39,10 @@
             </div>
           </vue-draggable-resizable> -->
           </div>
-          <div class="product__image--wrapper">
+          <div
+            class="product__image--wrapper"
+            :style="{ borderWidth: `${activeFrame.size}px` }"
+          >
             <div class="product__image" ref="image"></div>
           </div>
           <div
@@ -51,7 +54,7 @@
             <h4>Numer katalogowy: {{ product.catalogId }}</h4>
           </div>
         </div>
-        <div class="creator__container">
+        <div class="creator__container" ref="creator">
           <div class="creator__content">
             <div class="previews__container">
               <p class="title">Wybierz tło</p>
@@ -73,11 +76,20 @@
 
             <div class="frames__container">
               <p class="title">Dostosuj ramkę</p>
-              <select v-model="activeFrame">
-                <option v-for="(frame, i) in frames" :key="i">
-                  {{ frame }}
-                </option>
-              </select>
+              <ul class="background__previews border__previews">
+                <li
+                  class="preview active"
+                  v-for="frame in frames"
+                  :key="frame.title"
+                  @click="activeFrame = frame"
+                  :class="{ active: activeFrame === frame }"
+                >
+                  <!-- <img
+                    :src="require(`@/assets/images/frames/${frame.image}`)"
+                    :alt="frame.title"
+                  /> -->
+                </li>
+              </ul>
             </div>
             <div class="passe__container">
               <p class="title">Dostosuj Passe-out</p>
@@ -182,7 +194,14 @@ export default class Product extends Vue {
       image: "wall3.jpg"
     }
   ];
-  frames = ["Brak", "Ramka 1", "Ramka 2", "Ramka 3", "Ramka 4"];
+  frames = [
+    { title: "Brak", image: "", size: 0 },
+    { title: "Ramka 1", image: "", size: 5 },
+    { title: "Ramka 2", image: "", size: 10 },
+    { title: "Ramka 3", image: "", size: 20 },
+    { title: "Ramka 4", image: "", size: 30 }
+  ];
+
   activeArt = "";
   activeBackground = this.backgroundPreviews[0];
   activeFrame = this.frames[0];
@@ -198,9 +217,14 @@ export default class Product extends Vue {
   imageWidth = 200;
   imageHeight = 200;
 
+  created() {
+    this.isCreatorActive = false;
+  }
+
   mounted() {
     this.isCreatorActive = false;
     this.scrollAnimation();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const image = (this.$refs.image as any).getBoundingClientRect();
     this.imageWidth = image.width;
     this.imageHeight = image.height;
@@ -226,6 +250,7 @@ export default class Product extends Vue {
   }
 
   changeSize() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const image = (this.$refs.image as any).getBoundingClientRect();
     this.imageWidth = image.width;
     this.imageHeight = image.height;
@@ -360,9 +385,10 @@ export default class Product extends Vue {
       }
       .product__background--container {
         position: relative;
-        width: 100vw;
+        width: 100%;
         height: 100vh;
         z-index: 1;
+        @include flex;
       }
       .product__background {
         z-index: 2;
@@ -371,21 +397,27 @@ export default class Product extends Vue {
         @include backgroundDefault;
         background-image: url("../../assets/images/walls/wall1.jpg");
         .product__image--container {
-          width: 100vw;
+          width: 100%;
           height: 100vh;
         }
       }
       .product__image--wrapper {
         z-index: 3;
-        width: 100vw;
+        width: 100%;
         height: 100vh;
         position: absolute;
         top: 0;
+        border: solid black;
+        border-width: 0;
+        &.vertical {
+          width: 50vw;
+          margin: 0 auto;
+        }
         .product__image {
           width: 100%;
           height: 100%;
           @include backgroundDefault;
-          background-image: url("../../assets/images/paintings/003-2000.jpg");
+          background-image: url("../../assets/images/paintings/1.jpg");
         }
       }
       .product__description {
@@ -429,13 +461,16 @@ export default class Product extends Vue {
           width: 100%;
           height: 100%;
           display: grid;
-          grid-template-rows: repeat(3, 1fr);
+          grid-template-rows: 1.5fr 1fr 1fr;
           column-gap: $verticalPadding / 2;
           row-gap: $verticalPadding / 2;
           .title {
             width: max-content;
           }
+
+          .previews__container,
           .frames__container {
+            height: 100%;
           }
 
           .background__previews {
@@ -448,6 +483,11 @@ export default class Product extends Vue {
             padding: $verticalPadding / 4 0;
             align-items: center;
             justify-content: center;
+            &.border__previews {
+              height: 100%;
+              grid-template-columns: repeat(3, 1fr);
+              grid-template-rows: repeat(auto-fit, 2rem);
+            }
             .preview {
               width: 100%;
               height: 100%;
@@ -458,15 +498,13 @@ export default class Product extends Vue {
               }
               &:hover {
                 border-color: black;
+                cursor: pointer;
               }
 
               img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                &:hover {
-                  cursor: pointer;
-                }
               }
             }
           }
