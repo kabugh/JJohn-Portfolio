@@ -13,7 +13,7 @@
     </div>
     <div class="back__wrapper" v-else></div>
     <div class="logo" @click="$router.push('/')">
-      <!-- <img src="@/assets/images/logo_white.png" alt="logo" /> -->
+      <img src="@/assets/images/logo.png" alt="logo" />
     </div>
     <div class="burger__wrapper">
       <div

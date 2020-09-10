@@ -41,8 +41,24 @@ export default class NavOverlay extends Vue {
       link: "/"
     },
     {
-      title: "Produkty",
-      link: "/products/test"
+      title: "Obrazy",
+      link: "/produkty/obrazy"
+    },
+    {
+      title: "Rzeźby",
+      link: "/produkty/rzezby"
+    },
+    {
+      title: "Biżuteria",
+      link: "/produkty/bizuteria"
+    },
+    {
+      title: "Reprodukcje",
+      link: "/produkty/reprodukcje"
+    },
+    {
+      title: "O Autorce",
+      link: "/autor"
     }
   ];
   get filteredNavItems() {
