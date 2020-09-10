@@ -9,8 +9,18 @@
           @dragging="resize"
           :parentLimitation="true"
         > -->
-        <div class="product__background" ref="background">
-          <!-- <vue-draggable-resizable
+        <div class="product__background--container">
+          <div
+            class="product__background"
+            :style="{
+              backgroundImage:
+                'url(' +
+                require(`@/assets/images/walls/${activeBackground.image}`) +
+                ')'
+            }"
+            ref="background"
+          >
+            <!-- <vue-draggable-resizable
             :w="imageWidth"
             :h="imageHeight"
             @dragging="onDrag"
@@ -25,6 +35,7 @@
               <div class="product__image" ref="image"></div>
             </div>
           </vue-draggable-resizable> -->
+          </div>
           <div class="product__image--wrapper">
             <div class="product__image" ref="image"></div>
           </div>
@@ -32,6 +43,19 @@
       </div>
     </div>
     <div class="product__details">
+      <ul class="background__previews">
+        <li
+          class="preview"
+          v-for="preview in backgroundPreviews"
+          :key="preview.title"
+          @click="activeBackground = preview"
+        >
+          <img
+            :src="require(`@/assets/images/walls/${preview.image}`)"
+            :alt="preview.title"
+          />
+        </li>
+      </ul>
       <div class="product__description"></div>
       <h1>{{ product.title }}</h1>
       <p>{{ product.description }}</p>
@@ -43,7 +67,6 @@ import { Component, Vue } from "vue-property-decorator";
 import ProductModel from "@/utils/typings/ProductModel";
 import gsap from "gsap";
 
-import VueDragResize from "vue-drag-resize";
 import VueDraggableResizable from "vue-draggable-resizable";
 
 @Component({
@@ -52,9 +75,27 @@ import VueDraggableResizable from "vue-draggable-resizable";
 export default class Product extends Vue {
   product: ProductModel = {
     title: "Obraz",
-    image: "obraz",
+    image: "wall2.jpg",
     description: "obraz"
   };
+
+  backgroundPreviews = [
+    {
+      title: "Czerwona",
+      image: "wall2.jpg"
+    },
+    {
+      title: "Biała",
+      image: "wall1.jpg"
+    },
+    {
+      title: "Czarna",
+      image: "wall3.jpg"
+    }
+  ];
+
+  activeArt = "";
+  activeBackground = this.backgroundPreviews[0];
 
   isActive = false;
 
@@ -96,31 +137,37 @@ export default class Product extends Vue {
     const image = (this.$refs.image as any).getBoundingClientRect();
     this.imageWidth = image.width;
     this.imageHeight = image.height;
-    // console.log(this.imageWidth, this.imageHeight);
   }
 
   scrollAnimation() {
+    gsap.set(".product__image--wrapper", {
+      transformOrigin: "center 25%"
+    });
     gsap.to(".product__image--wrapper", {
       scrollTrigger: {
         start: "top top",
         end: "bottom .product__content",
-        scrub: 0.3,
+        scrub: 0.4,
         pin: ".product__content"
       },
-      scale: 0.25,
-      top: "-20%"
+      scale: 0.25
       // onUpdate: this.changeSize
+    });
+
+    gsap.set(".product__background", {
+      transformOrigin: "center 25%",
+      scale: 2.5
     });
 
     gsap.to(".product__background", {
       scrollTrigger: {
         start: "top .product__content",
         end: "bottom .product__content",
-        scrub: 0.5,
+        scrub: 0.4,
         pin: ".product__content"
       },
-      scale: 0.65,
-      onLeave: () => (this.isActive = true)
+      scale: 0.75,
+      onLeave: this.isActive = true
     });
   }
 }
@@ -136,27 +183,28 @@ export default class Product extends Vue {
     .product__content {
       width: 100%;
       height: 100vh;
-      .product__background {
-        z-index: 1;
+      .product__background--container {
+        position: relative;
         width: 100vw;
         height: 100vh;
+      }
+      .product__background {
+        z-index: 1;
+        width: 100%;
+        height: 100%;
         @include backgroundDefault;
         background-image: url("../../assets/images/walls/wall1.jpg");
-        position: relative;
         .product__image--container {
           width: 100vw;
           height: 100vh;
-          @include flex;
         }
-        .product__image--wrapper {
-          z-index: 2;
-
-          width: 100vw;
-          height: 100vh;
-          @include flex;
-          position: absolute;
-          top: 0;
-        }
+      }
+      .product__image--wrapper {
+        z-index: 2;
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        top: 0;
         .product__image {
           width: 100%;
           height: 100%;
@@ -171,6 +219,27 @@ export default class Product extends Vue {
     justify-content: flex-start;
     height: 100vh;
     padding: $verticalPadding / 2 $horizontalPadding;
+    .background__previews {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+      grid-auto-rows: 1fr;
+      column-gap: 3vh;
+      row-gap: 3vh;
+      padding-bottom: $verticalPadding;
+      .preview {
+        width: 100%;
+        height: 100%;
+        &:hover {
+          cursor: pointer;
+        }
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+    }
   }
 }
 </style>
