@@ -14,7 +14,7 @@ const routes: Array<RouteConfig> = [
   {
     path: "/",
     name: "Home",
-    component: Home,
+    component: () => import(/* webpackChunkName: "products" */ "../views/products/Product.vue"),
     beforeEnter: overlayGuard,
     meta: {
       initialNav: false

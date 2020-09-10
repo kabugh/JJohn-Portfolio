@@ -50,7 +50,7 @@ export default class TheNavbar extends Vue {
   }
 
   onScroll() {
-    const anchorPoint = document.querySelector(".introduction");
+    const anchorPoint = document.querySelector("body");
     if (this.$route.path === "/") {
       if (this.lastScrollPosition > anchorPoint.pageYOffset) {
         if (window.pageYOffset < 0) return;
