@@ -17,11 +17,11 @@ const routes: Array<RouteConfig> = [
     component: () => import(/* webpackChunkName: "products" */ "../views/products/Product.vue"),
     beforeEnter: overlayGuard,
     meta: {
-      initialNav: false
+      initialNav: true
     }
   },
   {
-    path: "/produkty/:type",
+    path: "/obrazy/:id",
     name: "Products",
     component: () =>
       import(/* webpackChunkName: "products" */ "../views/products/Products.vue"),

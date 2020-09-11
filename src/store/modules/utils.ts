@@ -1,8 +1,11 @@
+import gsap from "gsap";
+
 const state = {
     isNavOpen: false,
     loading: false,
     error: null,
-    overlayLoading: true
+    overlayLoading: true,
+    isCreatorActive: false
   };
   
   const mutations = {
@@ -20,6 +23,9 @@ const state = {
     },
     setOverlayLoading(state: { overlayLoading: boolean }, payload: boolean) {
       state.overlayLoading = payload;
+    },
+    setCreatorActive(state: { isCreatorActive: boolean }, payload: boolean) {
+      state.isCreatorActive = payload;
     }
   };
   
@@ -35,11 +41,44 @@ const state = {
     },
     overlayLoading(state: { overlayLoading: boolean }) {
       return state.overlayLoading;
+    },
+    isCreatorActive(state: { isCreatorActive: boolean }) {
+      return state.isCreatorActive;
     }
   };
+
+  const actions = {
+    closeCreator({ state, commit }: any) {
+      if (state.isCreatorActive) {
+        commit('setCreatorActive' , false);
+  
+        const tl = gsap.timeline();
+        tl.to(".creator__container", {
+          autoAlpha: 0,
+          y: -50
+        });
+  
+        tl.set(".creator__container", {
+          display: "none"
+        });
+        tl.to(".product__background--container", {
+          top: "auto",
+          left: "auto",
+          scale: 1,
+          ease: "power4"
+        });
+  
+        tl.set(".product__background--container", {
+          position: "static"
+        });
+      }
+    }
+  
+  }
   
   export default {
     state,
     mutations,
-    getters
+    getters,
+    actions
   };

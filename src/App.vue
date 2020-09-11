@@ -2,6 +2,7 @@
   <div id="app">
     <!-- <LoadingOverlay /> -->
     <TheNavbar />
+    <TheSlimNav />
     <transition name="navOverlay">
       <NavOverlay v-if="isNavOpen" />
     </transition>
@@ -20,11 +21,12 @@
 import { Vue, Component } from "vue-property-decorator";
 // import LoadingOverlay from "./components/LoadingOverlay.vue";
 import TheNavbar from "./components/navigation/TheNavbar.vue";
+import TheSlimNav from "./components/navigation/TheSlimNav.vue";
 import NavOverlay from "./components/navigation/NavOverlay.vue";
 // import TheFooter from "./components/TheFooter.vue";
 
 @Component({
-  components: { TheNavbar, NavOverlay }
+  components: { TheNavbar, TheSlimNav, NavOverlay }
 })
 export default class App extends Vue {
   get isNavOpen(): boolean {
