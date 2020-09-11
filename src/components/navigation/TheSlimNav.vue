@@ -8,6 +8,7 @@
     }"
   >
     <div class="back__wrapper" v-if="$route.path !== '/t'">
+      <div class="exit" v-if="isCreatorActive" @click="closeCreator"></div>
       <div class="arrow" v-else @click="$router.push('/')"></div>
     </div>
     <div class="burger__wrapper">
@@ -35,6 +36,9 @@ export default class TheSlimNav extends Vue {
     if (this.$route.meta.initialNav) this.showNavbar = true;
   }
 
+  closeCreator() {
+    this.$store.dispatch("closeCreator");
+  }
 
   get isNavOpen() {
     return this.$store.getters.isNavOpen;
