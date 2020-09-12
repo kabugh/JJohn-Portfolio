@@ -9,9 +9,6 @@
           @dragging="resize"
           :parentLimitation="true"
         > -->
-        <div class="exit" @click="closeCreator" v-if="isCreatorActive">
-          x
-        </div>
         <div class="product__background--container">
           <div
             class="product__background"
@@ -39,11 +36,44 @@
             </div>
           </vue-draggable-resizable> -->
           </div>
-          <div
-            class="product__image--wrapper"
-            :style="{ borderWidth: `${activeFrame.size}px` }"
-          >
-            <div class="product__image" ref="image"></div>
+          <div class="product__image--wrapper">
+            <div
+              class="product__image"
+              ref="image"
+              :class="{
+                passe__active: activePasse !== null,
+                frame__active: activeFrame !== null
+              }"
+              :style="{
+                transform: `scale(${1 - passeRange * 0.05})`
+              }"
+            ></div>
+            <div
+              class="passe-partout"
+              :style="{
+                backgroundColor: this.activePasse
+              }"
+            ></div>
+            <div class="frame__container" v-if="activeFrame !== null">
+              <div
+                v-for="(direction, index) in frameDirections"
+                :key="index"
+                :class="direction"
+                :style="{
+                  backgroundImage:
+                    'url(' +
+                    require(`@/assets/images/frames/f${activeFrame.id}/${direction}.png`) +
+                    ')'
+                }"
+              ></div>
+            </div>
+            <div
+              class="scroll__indicator"
+              v-scroll-to="'.product__description'"
+            >
+              <img src="@/assets/images/icons/mouse.png" alt="mouse" />
+              <p>Scrolluj lub kliknij</p>
+            </div>
           </div>
           <div
             class="product__description"
@@ -78,21 +108,60 @@
               <p class="title">Dostosuj ramkę</p>
               <ul class="background__previews border__previews">
                 <li
-                  class="preview active"
+                  class="preview empty"
+                  @click="activeFrame = null"
+                  :class="{ active: activeFrame === null }"
+                >
+                  brak
+                </li>
+                <li
+                  class="preview"
                   v-for="frame in frames"
                   :key="frame.title"
                   @click="activeFrame = frame"
                   :class="{ active: activeFrame === frame }"
                 >
-                  <!-- <img
-                    :src="require(`@/assets/images/frames/${frame.image}`)"
+                  <img
+                    :src="
+                      require(`@/assets/images/frames/f${frame.id}/top.png`)
+                    "
                     :alt="frame.title"
-                  /> -->
+                  />
                 </li>
               </ul>
             </div>
             <div class="passe__container">
-              <p class="title">Dostosuj Passe-out</p>
+              <div class="title__container">
+                <p class="title">Dostosuj passe-partout</p>
+                <input
+                  type="range"
+                  min="0"
+                  max="5"
+                  step="1"
+                  v-model="passeRange"
+                  v-if="activePasse !== null"
+                />
+              </div>
+              <ul class="background__previews passe__previews">
+                <li
+                  class="preview empty"
+                  @click="
+                    activePasse = null;
+                    passeRange = 0;
+                  "
+                  :class="{ active: activePasse === null }"
+                >
+                  brak
+                </li>
+                <li
+                  class="preview"
+                  v-for="(passe, j) in passes"
+                  :key="j"
+                  @click="activePasse = passe"
+                  :class="{ active: activePasse === passe }"
+                  :style="{ backgroundColor: passe }"
+                ></li>
+              </ul>
             </div>
           </div>
         </div>
@@ -180,14 +249,11 @@ export default class Product extends Vue {
     ]
   };
 
+  frameDirections = ["top", "bottom", "left", "right", "tl", "tr", "bl", "br"];
   backgroundPreviews = [
     {
       title: "Czerwona",
       image: "wall2.jpg"
-    },
-    {
-      title: "Biała",
-      image: "wall1.jpg"
     },
     {
       title: "Czarna",
@@ -195,19 +261,22 @@ export default class Product extends Vue {
     }
   ];
   frames = [
-    { title: "Brak", image: "", size: 0 },
-    { title: "Ramka 1", image: "", size: 5 },
-    { title: "Ramka 2", image: "", size: 10 },
-    { title: "Ramka 3", image: "", size: 20 },
-    { title: "Ramka 4", image: "", size: 30 }
+    { title: "Ramka 1", id: 1 },
+    { title: "Ramka 2", id: 2 },
+    { title: "Ramka 3", id: 3 },
+    { title: "Ramka 4", id: 4 }
   ];
+
+  passes = ["#cfbeb1", "#051767", "#000000", "#cccccc"];
 
   activeArt = "";
   activeBackground = this.backgroundPreviews[0];
-  activeFrame = this.frames[0];
+  activeFrame = null;
+  activePasse = null;
+  passeRange = 0;
+
   productDescription = false;
   isActive = false;
-  isCreatorActive = false;
 
   width = 0;
   height = 0;
@@ -292,10 +361,24 @@ export default class Product extends Vue {
           className: "inactive"
         },
         onUpdate: ({ progress }) => {
-          const progressThreshold = 0.85;
-          if (progress >= progressThreshold && !this.productDescription) {
+          const scrollThreshold = 0.05;
+          const navThreshold = 0.6;
+          const descThreshold = 0.85;
+          if (progress >= scrollThreshold) {
+            gsap.set(".scroll__indicator", {
+              autoAlpha: 0
+            });
+          }
+
+          if (progress >= navThreshold && !this.displaySlimNav) {
+            this.displaySlimNav = true;
+          } else if (progress < navThreshold && this.displaySlimNav) {
+            this.displaySlimNav = false;
+          }
+
+          if (progress >= descThreshold && !this.productDescription) {
             this.productDescription = true;
-          } else if (progress < progressThreshold && this.productDescription) {
+          } else if (progress < descThreshold && this.productDescription) {
             this.productDescription = false;
           }
         },
@@ -334,30 +417,20 @@ export default class Product extends Vue {
     }
   }
 
-  closeCreator() {
-    if (this.isCreatorActive) {
-      this.isCreatorActive = false;
+  get displaySlimNav() {
+    return this.$store.getters.displaySlimNav;
+  }
 
-      const tl = gsap.timeline();
-      tl.to(".creator__container", {
-        autoAlpha: 0,
-        y: -50
-      });
+  set displaySlimNav(value) {
+    this.$store.commit("setSlimNav", value);
+  }
 
-      tl.set(".creator__container", {
-        display: "none"
-      });
-      tl.to(".product__background--container", {
-        top: "auto",
-        left: "auto",
-        scale: 1,
-        ease: "power4"
-      });
+  get isCreatorActive() {
+    return this.$store.getters.isCreatorActive;
+  }
 
-      tl.set(".product__background--container", {
-        position: "static"
-      });
-    }
+  set isCreatorActive(value) {
+    this.$store.commit("setCreatorActive", value);
   }
 }
 </script>
@@ -406,18 +479,121 @@ export default class Product extends Vue {
         width: 100%;
         height: 100vh;
         position: absolute;
+        @include flex;
         top: 0;
-        border: solid black;
-        border-width: 0;
+        $frameSize: 3vw;
+        transition: background-color 0.15s linear 0.3s;
         &.vertical {
           width: 50vw;
           margin: 0 auto;
         }
         .product__image {
+          z-index: 2;
           width: 100%;
           height: 100%;
           @include backgroundDefault;
           background-image: url("../../assets/images/paintings/1.jpg");
+          transition: width 0.3s cubic-bezier(0.65, 0, 0.35, 1),
+            height 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+          &.frame__active {
+            width: calc(100% - 2 * #{$frameSize});
+            height: calc(100% - 2 * #{$frameSize});
+          }
+          &.passe__active {
+            width: calc(100% - 4 * #{$frameSize});
+            height: calc(100% - 4 * #{$frameSize});
+          }
+        }
+        .passe-partout {
+          z-index: 1;
+          position: absolute;
+          width: calc(100% - 2 * #{$frameSize});
+          height: calc(100% - 2 * #{$frameSize});
+          background-color: #cfbeb1;
+        }
+        .frame__container {
+          position: absolute;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          > div {
+            position: absolute;
+            background-position: center;
+            background-repeat: repeat;
+          }
+          .top,
+          .bottom {
+            width: 100%;
+            height: $frameSize;
+            background-size: auto 100%;
+          }
+          .top {
+            top: 0;
+          }
+          .bottom {
+            bottom: 0;
+          }
+          .left,
+          .right {
+            width: $frameSize;
+            height: 100%;
+            background-size: 100% auto;
+          }
+          .left {
+            left: 0;
+          }
+          .right {
+            right: 0;
+          }
+          .tl,
+          .tr,
+          .bl,
+          .br {
+            width: $frameSize;
+            height: $frameSize;
+            background-size: 100% 100%;
+          }
+          .tl {
+            top: 0;
+            left: 0;
+          }
+          .tr {
+            top: 0;
+            right: 0;
+          }
+          .bl {
+            bottom: 0;
+            left: 0;
+          }
+          .br {
+            bottom: 0;
+            right: 0;
+          }
+        }
+        .scroll__indicator {
+          position: absolute;
+          bottom: 0;
+          z-index: 2;
+          padding-bottom: $verticalPadding / 4;
+          @include flex;
+          flex-direction: row;
+          transition: all 0.2s cubic-bezier(0.65, 0, 0.35, 1);
+
+          &:hover {
+            cursor: pointer;
+          }
+          img {
+            width: 28px;
+            height: 28px;
+            object-fit: cover;
+          }
+          p {
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: white;
+            margin-left: 5px;
+          }
         }
       }
       .product__description {
@@ -469,7 +645,8 @@ export default class Product extends Vue {
           }
 
           .previews__container,
-          .frames__container {
+          .frames__container,
+          .passe__container {
             height: 100%;
           }
 
@@ -483,7 +660,8 @@ export default class Product extends Vue {
             padding: $verticalPadding / 4 0;
             align-items: center;
             justify-content: center;
-            &.border__previews {
+            &.border__previews,
+            &.passe__previews {
               height: 100%;
               grid-template-columns: repeat(3, 1fr);
               grid-template-rows: repeat(auto-fit, 2rem);
@@ -493,8 +671,14 @@ export default class Product extends Vue {
               height: 100%;
               border: 2px solid white;
               transition: border-color 0.25s ease-in-out;
+              @include flex;
+              text-transform: uppercase;
+              font-size: 0.875rem;
               &.active {
                 border-color: black;
+              }
+              &.empty {
+                background-color: #eee;
               }
               &:hover {
                 border-color: black;
