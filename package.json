@@ -11,6 +11,7 @@
     "contentful": "^7.14.6",
     "core-js": "^3.6.5",
     "gsap": "^3.5.1",
+    "macy": "^2.5.1",
     "register-service-worker": "^1.7.1",
     "rellax": "^1.12.1",
     "swiper": "^6.2.0",

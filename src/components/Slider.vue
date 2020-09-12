@@ -47,6 +47,7 @@ import "swiper/swiper.scss";
 
 @Component
 export default class Slider extends Vue {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   slider: any = {};
   mounted() {
     this.slider = new Swiper(".swiper-container", {
@@ -69,13 +70,13 @@ export default class Slider extends Vue {
     {
       title: "Rzeźby",
       description: "test",
-      image: "1.jpg",
+      image: "2.jpg",
       slug: "/rzezby"
     },
     {
       title: "Bizuteria",
       description: "test",
-      image: "1.jpg",
+      image: "3.jpg",
       slug: "/bizuteria"
     }
   ];

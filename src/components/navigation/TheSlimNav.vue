@@ -2,12 +2,12 @@
   <nav
     class="slimNav"
     :class="{
-      hiddenNavbar: !displaySlimNav
+      hiddenNavbar: !displaySlimNav && !$route.meta.displaySlimNav
     }"
   >
     <div class="back__wrapper" v-if="$route.path !== '/t'">
       <div class="exit" v-if="isCreatorActive" @click="closeCreator"></div>
-      <div class="arrow" v-else @click="$router.push('/')"></div>
+      <div class="arrow" v-else @click="$router.go(-1)"></div>
     </div>
     <div class="burger__wrapper">
       <div

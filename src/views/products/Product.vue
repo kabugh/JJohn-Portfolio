@@ -41,11 +41,16 @@
               class="product__image"
               ref="image"
               :class="{
+                transitions__active: isCreatorActive,
                 passe__active: activePasse !== null,
                 frame__active: activeFrame !== null
               }"
               :style="{
-                transform: `scale(${1 - passeRange * 0.05})`
+                transform: `scale(${1 - passeRange * 0.05})`,
+                backgroundImage:
+                  'url(' +
+                  require(`@/assets/images/paintings/${product.image}.jpg`) +
+                  ')'
               }"
             ></div>
             <div
@@ -228,7 +233,7 @@ import VueDraggableResizable from "vue-draggable-resizable";
 export default class Product extends Vue {
   product: ProductModel = {
     title: "Zamieniony w skałę poruszam ustami",
-    image: "wall2.jpg",
+    image: this.$route.params.id,
     catalogId: 155,
     description: "obraz",
     details: {
@@ -333,9 +338,9 @@ export default class Product extends Vue {
   }
 
   scrollAnimation() {
-    gsap.set(".product__image--wrapper", {
-      transformOrigin: "center 25%"
-    });
+    // gsap.set(".product__image--wrapper", {
+    //   transformOrigin: "center 25%"
+    // });
     gsap.to(".product__image--wrapper", {
       scrollTrigger: {
         start: "top top",
@@ -364,6 +369,7 @@ export default class Product extends Vue {
           const scrollThreshold = 0.05;
           const navThreshold = 0.6;
           const descThreshold = 0.85;
+
           if (progress >= scrollThreshold) {
             gsap.set(".scroll__indicator", {
               autoAlpha: 0
@@ -385,8 +391,8 @@ export default class Product extends Vue {
         scrub: 0.4,
         pin: ".product__content"
       },
-      scale: 0.6,
-      onLeave: this.isActive = true
+      scale: 0.6
+      // onLeave: this.isActive = true
     });
   }
 
@@ -482,6 +488,7 @@ export default class Product extends Vue {
         @include flex;
         top: 0;
         $frameSize: 3vw;
+        transform-origin: center 25%;
         transition: background-color 0.15s linear 0.3s;
         &.vertical {
           width: 50vw;
@@ -493,8 +500,11 @@ export default class Product extends Vue {
           height: 100%;
           @include backgroundDefault;
           background-image: url("../../assets/images/paintings/1.jpg");
-          transition: width 0.3s cubic-bezier(0.65, 0, 0.35, 1),
-            height 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+          &.transitions__active {
+            transition: width 0.3s cubic-bezier(0.65, 0, 0.35, 1),
+              height 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+          }
+
           &.frame__active {
             width: calc(100% - 2 * #{$frameSize});
             height: calc(100% - 2 * #{$frameSize});

@@ -21,6 +21,7 @@ Vue.use(VueScrollTo, {
   }
 });
 
+
 Vue.config.productionTip = false;
 
 new Vue({

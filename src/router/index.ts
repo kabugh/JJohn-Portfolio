@@ -19,7 +19,8 @@ const routes: Array<RouteConfig> = [
     beforeEnter: overlayGuard,
     meta: {
       initialNav: true,
-      displayNav: true
+      displayNav: true,
+      displaySlimNav: false,
     }
   },
   {
@@ -28,10 +29,11 @@ const routes: Array<RouteConfig> = [
     component: () =>
       import(/* webpackChunkName: "products" */ "../views/products/Products.vue"),
     beforeEnter: overlayGuard,
+    props: true,
     meta: {
-      initialNav: false,
-      displayNav: false
-
+      initialNav: true,
+      displayNav: false,
+      displaySlimNav: true,
     }
   },
   {
@@ -40,9 +42,11 @@ const routes: Array<RouteConfig> = [
     component: () =>
       import(/* webpackChunkName: "product" */ "../views/products/Product.vue"),
     beforeEnter: overlayGuard,
+    props: true,
     meta: {
       initialNav: false,
-      displayNav: false
+      displayNav: false,
+      displaySlimNav: false,
     }
   }
 ];
