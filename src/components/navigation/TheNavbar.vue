@@ -4,14 +4,23 @@
     :class="{
       hiddenNavbar:
         (!showNavbar && !isNavOpen && !$route.meta.initialNav) ||
-        ($route.path === '/' && !isNavOpen)
+        (!$route.meta.displayNav && !isNavOpen)
     }"
   >
     <div class="back__wrapper" v-if="$route.path !== '/'">
       <div class="arrow" @click="$router.push('/')"></div>
-      <div class="back" @click="$router.push('/')">Powrót</div>
     </div>
-    <div class="back__wrapper" v-else></div>
+    <div class="back__wrapper" v-else>
+      <ul>
+        <li
+          v-for="(item, index) in navItems"
+          @click="$router.push(item.slug)"
+          :key="index"
+        >
+          {{ item.title }}
+        </li>
+      </ul>
+    </div>
     <div class="logo" @click="$router.push('/')">
       <img src="@/assets/images/logo.png" alt="logo" />
     </div>
@@ -29,8 +38,9 @@
     </div>
   </nav>
 </template>
-<script>
+<script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import NavItem from "@/utils/typings/NavItem";
 
 @Component
 export default class TheNavbar extends Vue {
@@ -38,6 +48,12 @@ export default class TheNavbar extends Vue {
   lastScrollPosition = 0;
   scrollValue = 0;
   showNavbar = false;
+
+  navItems: NavItem[] = [
+    { title: "obrazy", slug: "/obrazy" },
+    { title: "rzeźby", slug: "/rzezby" },
+    { title: "biżuteria", slug: "/bizuteria" }
+  ];
 
   mounted() {
     if (this.$route.meta.initialNav) this.showNavbar = true;
@@ -50,7 +66,8 @@ export default class TheNavbar extends Vue {
   }
 
   onScroll() {
-    const anchorPoint = document.querySelector("body");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const anchorPoint: any = document.querySelector("body");
     if (this.$route.path === "/") {
       if (this.lastScrollPosition > anchorPoint.pageYOffset) {
         if (window.pageYOffset < 0) return;
@@ -94,7 +111,7 @@ export default class TheNavbar extends Vue {
 .navbar {
   width: 100%;
   min-height: 6vh;
-  background-color: black;
+  background-color: white;
   position: fixed;
   padding: 15px 6vw;
   z-index: 100;
@@ -130,13 +147,13 @@ export default class TheNavbar extends Vue {
     }
   }
   .back__wrapper {
-    color: white;
+    color: black;
     display: flex;
     justify-content: flex-start;
     align-items: center;
     flex: 1;
     .arrow {
-      background-image: url("../../assets/images/icons/arrow.png");
+      background-image: url("../../assets/images/icons/arrow_black.png");
       @include backgroundDefault;
       width: 36px;
       height: 36px;
@@ -146,6 +163,25 @@ export default class TheNavbar extends Vue {
     .back:hover {
       cursor: pointer;
       text-decoration: underline;
+    }
+    ul {
+      @include flex;
+      display: none;
+      justify-content: flex-start;
+      flex-direction: row;
+      li {
+        text-transform: uppercase;
+        margin: 0 $horizontalPadding / 12;
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+
+    @media (min-width: 1280px) {
+      ul {
+        display: flex;
+      }
     }
     @media (max-width: 700px) {
       .back {
@@ -159,6 +195,9 @@ export default class TheNavbar extends Vue {
     align-items: center;
     flex: 1;
     height: 100%;
+    #nav-icon span {
+      background-color: black;
+    }
     p {
       cursor: pointer;
       text-decoration: underline;

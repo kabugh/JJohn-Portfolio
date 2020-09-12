@@ -2,9 +2,7 @@
   <nav
     class="slimNav"
     :class="{
-      hiddenNavbar:
-        (!showNavbar && !isNavOpen && !$route.meta.initialNav) ||
-        ($route.path === '/' && !isNavOpen)
+      hiddenNavbar: !displaySlimNav
     }"
   >
     <div class="back__wrapper" v-if="$route.path !== '/t'">
@@ -30,12 +28,6 @@ import { Component, Vue } from "vue-property-decorator";
 
 @Component
 export default class TheSlimNav extends Vue {
-  showNavbar = false;
-
-  mounted() {
-    if (this.$route.meta.initialNav) this.showNavbar = true;
-  }
-
   closeCreator() {
     this.$store.dispatch("closeCreator");
   }
@@ -46,6 +38,14 @@ export default class TheSlimNav extends Vue {
 
   set isNavOpen(value) {
     this.$store.commit("setNav", value);
+  }
+
+  get displaySlimNav() {
+    return this.$store.getters.displaySlimNav;
+  }
+
+  set displaySlimNav(value) {
+    this.$store.commit("setSlimNav", value);
   }
 
   get isCreatorActive() {
@@ -63,14 +63,17 @@ export default class TheSlimNav extends Vue {
   position: fixed;
   width: 100%;
   min-height: 6vh;
-  top: $verticalPadding;
+  top: $verticalPadding / 2;
   z-index: 99;
   display: flex;
   justify-content: space-between;
   padding: 0 $verticalPadding;
-  //   &.hiddenNavbar {
-  //     transform: translateY(-100%);
-  //   }
+  transition: transform 0.3s cubic-bezier(0.65, 0, 0.35, 1),
+    opacity 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+  &.hiddenNavbar {
+    transform: translateY(2vh);
+    opacity: 0;
+  }
   .back__wrapper {
     color: white;
     display: flex;
@@ -82,15 +85,14 @@ export default class TheSlimNav extends Vue {
       @include backgroundDefault;
       width: 36px;
       height: 36px;
-      margin-right: 15px;
     }
     .arrow:hover,
     .exit:hover {
       cursor: pointer;
     }
     .exit {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       background-image: url("../../assets/images/icons/exit.png");
     }
   }

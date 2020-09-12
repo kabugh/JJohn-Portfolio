@@ -3,8 +3,8 @@
     <div ref="overlay" class="overlay__container">
       <div class="overlay__wrapper">
         <ul class="navItems">
-          <li class="item" v-for="item in filteredNavItems" :key="item.link">
-            <span @click="$router.push(item.link)">{{ item.title }}</span>
+          <li class="item" v-for="item in filteredNavItems" :key="item.slug">
+            <span @click="$router.push(item.slug)">{{ item.title }}</span>
           </li>
           <!-- <li class="socials__container item">
             <a
@@ -27,44 +27,40 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-
-interface NavItem {
-  title: string;
-  link: string;
-}
+import NavItem from "@/utils/typings/NavItem";
 
 @Component
 export default class NavOverlay extends Vue {
   navItems: NavItem[] = [
     {
       title: "Start",
-      link: "/"
+      slug: "/"
     },
     {
       title: "Obrazy",
-      link: "/produkty/obrazy"
+      slug: "/produkty/obrazy"
     },
     {
       title: "Rzeźby",
-      link: "/produkty/rzezby"
+      slug: "/produkty/rzezby"
     },
     {
       title: "Biżuteria",
-      link: "/produkty/bizuteria"
+      slug: "/produkty/bizuteria"
     },
     {
       title: "Reprodukcje",
-      link: "/produkty/reprodukcje"
+      slug: "/produkty/reprodukcje"
     },
     {
       title: "O Autorce",
-      link: "/autor"
+      slug: "/autor"
     }
   ];
   get filteredNavItems() {
     const fitleredItems: NavItem[] = [];
     this.navItems.forEach(item => {
-      if (this.$route.path !== item.link) {
+      if (this.$route.path !== item.slug) {
         fitleredItems.push(item);
       }
     });

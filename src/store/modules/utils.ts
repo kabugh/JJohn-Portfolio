@@ -5,7 +5,8 @@ const state = {
     loading: false,
     error: null,
     overlayLoading: true,
-    isCreatorActive: false
+    isCreatorActive: false,
+    displaySlimNav: false
   };
   
   const mutations = {
@@ -26,6 +27,9 @@ const state = {
     },
     setCreatorActive(state: { isCreatorActive: boolean }, payload: boolean) {
       state.isCreatorActive = payload;
+    },
+    setSlimNav(state: { displaySlimNav: boolean }, payload: boolean) {
+      state.displaySlimNav = payload;
     }
   };
   
@@ -44,6 +48,9 @@ const state = {
     },
     isCreatorActive(state: { isCreatorActive: boolean }) {
       return state.isCreatorActive;
+    },
+    displaySlimNav(state: { displaySlimNav: boolean }) {
+      return state.displaySlimNav;
     }
   };
 

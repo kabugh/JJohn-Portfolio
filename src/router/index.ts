@@ -7,6 +7,7 @@ Vue.use(VueRouter);
 
 const overlayGuard = (to: Route, from: Route, next: Function) => {
   store.commit("setNav", false);
+  store.commit("setCreatorActive", false);
   next();
 };
 
@@ -14,30 +15,34 @@ const routes: Array<RouteConfig> = [
   {
     path: "/",
     name: "Home",
-    component: () => import(/* webpackChunkName: "products" */ "../views/products/Product.vue"),
+    component: () => import(/* webpackChunkName: "products" */ "../views/Home.vue"),
     beforeEnter: overlayGuard,
     meta: {
-      initialNav: true
+      initialNav: true,
+      displayNav: true
     }
   },
   {
-    path: "/obrazy/:id",
+    path: "/:category",
     name: "Products",
     component: () =>
       import(/* webpackChunkName: "products" */ "../views/products/Products.vue"),
     beforeEnter: overlayGuard,
     meta: {
-      initialNav: true
+      initialNav: false,
+      displayNav: false
+
     }
   },
   {
-    path: "/produkty/:type/:id",
+    path: "/:category/:id",
     name: "Product",
     component: () =>
       import(/* webpackChunkName: "product" */ "../views/products/Product.vue"),
     beforeEnter: overlayGuard,
     meta: {
-      initialNav: true
+      initialNav: false,
+      displayNav: false
     }
   }
 ];
