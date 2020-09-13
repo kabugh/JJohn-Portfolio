@@ -36,7 +36,7 @@
             </div>
           </vue-draggable-resizable> -->
           </div>
-          <div class="product__image--wrapper">
+          <div class="product__image--wrapper horizontal">
             <div
               class="product__image"
               ref="image"
@@ -338,9 +338,16 @@ export default class Product extends Vue {
   }
 
   scrollAnimation() {
-    // gsap.set(".product__image--wrapper", {
-    //   transformOrigin: "center 25%"
-    // });
+    const verticalMobile = window.matchMedia("(max-width: 450px)");
+    const verticalBiggerScreen = window.matchMedia(
+      "(min-width: 768px) and (orientation: portrait)"
+    );
+
+    gsap.set(".product__background", {
+      transformOrigin: "center 25%",
+      scale: 2.5
+    });
+
     gsap.to(".product__image--wrapper", {
       scrollTrigger: {
         start: "top top",
@@ -349,12 +356,8 @@ export default class Product extends Vue {
         pin: ".product__content"
       },
       scale: 0.2
-      // onUpdate: this.changeSize
-    });
-
-    gsap.set(".product__background", {
-      transformOrigin: "center 25%",
-      scale: 2.5
+      // width: verticalBiggerScreen ? "50%" : "auto",
+      // height: verticalBiggerScreen ? "100vh" : "auto"
     });
 
     gsap.to(".product__background", {
@@ -367,8 +370,8 @@ export default class Product extends Vue {
         },
         onUpdate: ({ progress }) => {
           const scrollThreshold = 0.05;
-          const navThreshold = 0.6;
-          const descThreshold = 0.85;
+          const navThreshold = verticalMobile.matches ? 0.8 : 0.6;
+          const descThreshold = verticalMobile.matches ? 0.8 : 0.85;
 
           if (progress >= scrollThreshold) {
             gsap.set(".scroll__indicator", {
@@ -392,7 +395,6 @@ export default class Product extends Vue {
         pin: ".product__content"
       },
       scale: 0.6
-      // onLeave: this.isActive = true
     });
   }
 
@@ -491,8 +493,9 @@ export default class Product extends Vue {
         transform-origin: center 25%;
         transition: background-color 0.15s linear 0.3s;
         &.vertical {
-          width: 50vw;
           margin: 0 auto;
+          // width: 100%;
+          // height: 150%;
         }
         .product__image {
           z-index: 2;
@@ -609,20 +612,22 @@ export default class Product extends Vue {
       .product__description {
         z-index: 1;
         position: absolute;
+        min-width: 80%;
         left: 50%;
-        bottom: 3vh;
+        bottom: 0;
+        padding: $verticalPadding / 4;
         transform: translate(-50%, -50%);
         @include flex;
         text-align: center;
         opacity: 0;
         transition: opacity 0.2s cubic-bezier(0.65, 0, 0.35, 1);
         h2 {
-          font-size: 2.5rem;
+          font-size: 1.25rem;
           font-weight: 600;
           line-height: 1;
         }
         h4 {
-          font-size: 1.75rem;
+          font-size: 1rem;
           font-weight: 400;
           line-height: 1;
           margin-top: $verticalPadding / 2;
@@ -647,7 +652,7 @@ export default class Product extends Vue {
           width: 100%;
           height: 100%;
           display: grid;
-          grid-template-rows: 1.5fr 1fr 1fr;
+          grid-template-rows: auto auto 1fr;
           column-gap: $verticalPadding / 2;
           row-gap: $verticalPadding / 2;
           .title {
@@ -702,6 +707,88 @@ export default class Product extends Vue {
               }
             }
           }
+        }
+      }
+
+      @media (min-width: 360px) {
+        .product__description {
+          h2 {
+            font-size: 1.75rem;
+          }
+          h4 {
+            font-size: 1.25rem;
+          }
+        }
+      }
+
+      @media (min-width: 768px) and (min-height: 500px) {
+        .product__description {
+          min-width: auto;
+          bottom: 3vh;
+          padding: 0;
+          h2 {
+            font-size: 2.5rem;
+          }
+          h4 {
+            font-size: 1.75rem;
+          }
+        }
+      }
+
+      @media (max-width: 850px) and (max-height: 450px) and (orientation: landscape) {
+        .product__description {
+          @media (min-width: 800px) and (max-height: 400px) {
+            min-width: 100%;
+            bottom: 3vh;
+            padding: 0;
+          }
+          @media (max-width: 650px) and (max-height: 350px) {
+            min-width: 100%;
+            bottom: 0;
+            padding: 0;
+            h2 {
+              font-size: 1.5rem;
+            }
+            h4 {
+              font-size: 1rem;
+            }
+          }
+        }
+
+        .creator__container {
+          .creator__content {
+            .background__previews {
+              grid-template-rows: repeat(auto-fit, minmax(2rem, 4rem));
+            }
+          }
+        }
+      }
+      @media (max-width: 1024px) and (orientation: portrait) {
+        .product__background {
+          min-width: 120%;
+        }
+        .product__image--wrapper.horizontal {
+          min-width: 200%;
+        }
+      }
+      @media (max-width: 450px) and (orientation: portrait) {
+        .product__background {
+          min-width: 150%;
+        }
+        .product__image--wrapper.horizontal {
+          min-width: 300%;
+        }
+      }
+
+      @media (min-width: 1024px) and (min-height: 500px) {
+        .product__description {
+          min-width: 100%;
+          bottom: 1vh;
+        }
+      }
+      @media (min-width: 1280px) and (min-height: 500px) {
+        .product__description {
+          min-width: auto;
         }
       }
     }

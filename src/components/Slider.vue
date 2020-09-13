@@ -100,10 +100,10 @@ export default class Slider extends Vue {
       .swiper-slide {
         .swiper-slide__content {
           @include flex;
+          flex-direction: column;
           max-width: 70%;
           margin: 0 auto;
           height: 100%;
-
           img {
             width: 100%;
             min-height: 70%;
@@ -141,17 +141,19 @@ export default class Slider extends Vue {
               }
             }
             .swiper__content--container {
-              margin-top: $verticalPadding;
+              margin-top: $verticalPadding / 3;
               width: 100%;
               @include flex;
               justify-content: space-between;
-              flex-direction: row;
+              align-items: flex-start;
+              flex-direction: column;
               .swiper__content {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
+                margin-bottom: $verticalPadding / 4;
                 h1 {
-                  font-size: 1.75rem;
+                  font-size: 1.25rem;
                   font-weight: 700;
                   letter-spacing: 1px;
                   text-transform: uppercase;
@@ -168,6 +170,23 @@ export default class Slider extends Vue {
                 font-size: 0.75rem;
                 padding: 12px;
                 font-weight: 600;
+                width: 100%;
+              }
+              @media (min-width: 360px) {
+                .swiper__content h1 {
+                  font-size: 1.75rem;
+                }
+              }
+              @media (min-width: 450px) {
+                margin-top: $verticalPadding;
+                align-items: center;
+                flex-direction: row;
+                .swiper__content {
+                  margin-bottom: 0;
+                }
+                button {
+                  width: auto;
+                }
               }
             }
           }

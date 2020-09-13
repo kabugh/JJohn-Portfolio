@@ -20,7 +20,8 @@ import Macy from "macy";
 
 @Component
 export default class Products extends Vue {
-  macy = {};
+  macy: any = {};
+  gridLoaded = false;
   mounted() {
     this.macy = Macy({
       container: ".macy__grid",
@@ -31,8 +32,12 @@ export default class Products extends Vue {
       breakAt: {
         1650: 3,
         940: 2,
-        400: 1
+        450: 1
       }
+    });
+
+    this.macy.on(this.macy.constants.EVENT_IMAGE_COMPLETE, (ctx: any) => {
+      this.gridLoaded = true;
     });
   }
 
@@ -73,7 +78,7 @@ export default class Products extends Vue {
   width: 100%;
   color: black;
   .products__container {
-    padding: $verticalPadding * 5 / 2 $horizontalPadding;
+    padding: $verticalPadding * 5 / 2 $horizontalPadding * 3 / 4;
     h1 {
       font-size: 3rem;
       font-weight: 700;
@@ -85,6 +90,17 @@ export default class Products extends Vue {
         &:hover {
           cursor: pointer;
         }
+      }
+    }
+    @media (min-width: 768px) {
+    }
+
+    @media (max-width: 850px) and (max-height: 450px) and (orientation: landscape) {
+      padding: $verticalPadding * 7 / 2 $horizontalPadding * 3 / 4;
+    }
+    @media (max-width: 650px) and (max-height: 350px) and (orientation: landscape) {
+      h1 {
+        font-size: 2.5rem;
       }
     }
   }
