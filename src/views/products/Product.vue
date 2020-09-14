@@ -276,9 +276,9 @@ export default class Product extends Vue {
 
   activeArt = "";
   activeBackground = this.backgroundPreviews[0];
-  activeFrame = null;
-  activePasse = null;
-  passeRange = 0;
+  activeFrame = this.frames[0];
+  activePasse = this.passes[0];
+  passeRange = 1;
 
   productDescription = false;
   isActive = false;
@@ -339,9 +339,9 @@ export default class Product extends Vue {
 
   scrollAnimation() {
     const verticalMobile = window.matchMedia("(max-width: 450px)");
-    const verticalBiggerScreen = window.matchMedia(
-      "(min-width: 768px) and (orientation: portrait)"
-    );
+    // const verticalBiggerScreen = window.matchMedia(
+    //   "(min-width: 768px) and (orientation: portrait)"
+    // );
 
     gsap.set(".product__background", {
       transformOrigin: "center 25%",
@@ -400,15 +400,18 @@ export default class Product extends Vue {
 
   startCreator() {
     if (!this.isCreatorActive) {
+      const mobileView = window.matchMedia("(max-width: 450px)");
+      this.$scrollTo(".product__description", 2000);
       this.isCreatorActive = true;
       const tl = gsap.timeline();
-
-      tl.to(".product__background--container", {
-        position: "absolute",
-        top: "-10%",
-        left: "-15%",
-        scale: 0.75
-      });
+      if (!mobileView.matches) {
+        tl.to(".product__background--container", {
+          position: "absolute",
+          top: "-10%",
+          left: "-15%",
+          scale: 0.75
+        });
+      }
 
       tl.set(".creator__container", {
         autoAlpha: 0,
@@ -417,7 +420,7 @@ export default class Product extends Vue {
       });
 
       tl.to(".creator__container", {
-        duration: 1.5,
+        duration: mobileView ? 0.75 : 1.5,
         ease: "power4",
         y: 0,
         autoAlpha: 1
@@ -490,6 +493,7 @@ export default class Product extends Vue {
         @include flex;
         top: 0;
         $frameSize: 3vw;
+        $mobileFrameSize: 8vw;
         transform-origin: center 25%;
         transition: background-color 0.15s linear 0.3s;
         &.vertical {
@@ -516,13 +520,27 @@ export default class Product extends Vue {
             width: calc(100% - 4 * #{$frameSize});
             height: calc(100% - 4 * #{$frameSize});
           }
+          @media (max-width: 768px) and (min-height: 650px) {
+            &.frame__active {
+              width: calc(100% - 2 * #{$mobileFrameSize});
+              height: calc(100% - 2 * #{$mobileFrameSize});
+            }
+            &.passe__active {
+              width: calc(100% - 4 * #{$mobileFrameSize});
+              height: calc(100% - 4 * #{$mobileFrameSize});
+            }
+          }
         }
         .passe-partout {
           z-index: 1;
           position: absolute;
+          background-color: #cfbeb1;
           width: calc(100% - 2 * #{$frameSize});
           height: calc(100% - 2 * #{$frameSize});
-          background-color: #cfbeb1;
+          @media (max-width: 768px) and (min-height: 650px) {
+            width: calc(100% - 2 * #{$mobileFrameSize});
+            height: calc(100% - 2 * #{$mobileFrameSize});
+          }
         }
         .frame__container {
           position: absolute;
@@ -582,6 +600,25 @@ export default class Product extends Vue {
             bottom: 0;
             right: 0;
           }
+
+          @media (max-width: 768px) and (min-height: 650px) {
+            .top,
+            .bottom {
+              height: $mobileFrameSize;
+            }
+
+            .left,
+            .right {
+              width: $mobileFrameSize;
+            }
+            .tl,
+            .tr,
+            .bl,
+            .br {
+              width: $mobileFrameSize;
+              height: $mobileFrameSize;
+            }
+          }
         }
         .scroll__indicator {
           position: absolute;
@@ -639,15 +676,22 @@ export default class Product extends Vue {
       }
       .creator__container {
         display: none;
-        position: absolute;
+        position: fixed;
         bottom: 0;
-        right: 0;
-        max-width: 35%;
+        background-color: white;
+        max-width: 100%;
         height: 100%;
-        padding: $verticalPadding $horizontalPadding / 4;
+        padding: $verticalPadding * 2 $horizontalPadding / 4 $verticalPadding
+          $horizontalPadding / 4;
         z-index: 2;
         margin-left: auto;
-
+        @media (min-width: 768px) and (min-height: 500px) {
+          position: absolute;
+          background-color: transparent;
+          right: 0;
+          max-width: 35%;
+          padding: $verticalPadding $horizontalPadding / 4;
+        }
         .creator__content {
           width: 100%;
           height: 100%;

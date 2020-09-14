@@ -9,7 +9,7 @@
       <div class="exit" v-if="isCreatorActive" @click="closeCreator"></div>
       <div class="arrow" v-else @click="$router.go(-1)"></div>
     </div>
-    <div class="burger__wrapper">
+    <div class="burger__wrapper" v-if="!isCreatorActive">
       <div
         class="nav-mobile"
         id="nav-icon"
@@ -67,9 +67,12 @@ export default class TheSlimNav extends Vue {
   z-index: 99;
   display: flex;
   justify-content: space-between;
-  padding: 0 $verticalPadding;
+  padding: 0 $verticalPadding / 2;
   transition: transform 0.3s cubic-bezier(0.65, 0, 0.35, 1),
     opacity 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+  @media (min-width: 1024px) {
+    padding: 0 $verticalPadding;
+  }
   &.hiddenNavbar {
     transform: translateY(2vh);
     opacity: 0;

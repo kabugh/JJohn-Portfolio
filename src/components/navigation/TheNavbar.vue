@@ -123,8 +123,12 @@ export default class TheNavbar extends Vue {
     transform: translateY(-100%);
   }
   .logo {
-    max-width: 40vw;
-    max-height: 8vh;
+    max-width: 36px;
+    max-height: 36px;
+    @media (min-width: 360px) {
+      max-width: 48px;
+      max-height: 48px;
+    }
     color: white;
     @include backgroundDefault;
     @include flex;
@@ -201,44 +205,6 @@ export default class TheNavbar extends Vue {
     p {
       cursor: pointer;
       text-decoration: underline;
-    }
-  }
-
-  @media (min-width: 450px) {
-    .logo {
-      max-width: 30vw;
-    }
-  }
-  @media (min-width: 768px) {
-    .logo {
-      max-width: 25vw;
-    }
-  }
-  @media (max-width: 850px) and (max-height: 450px) and (orientation: landscape) {
-    .logo {
-      max-width: 30vw;
-      max-height: 10vh;
-    }
-    @media (min-width: 800px) and (max-height: 400px) {
-      .logo {
-        max-width: 22vw;
-        max-height: 10vh;
-      }
-    }
-  }
-  @media (min-width: 1024px) {
-    .logo {
-      max-width: 20vw;
-    }
-  }
-  @media (min-width: 1280px) {
-    .logo {
-      max-width: 15vw;
-    }
-  }
-  @media (min-width: 1650px) {
-    .logo {
-      max-width: 10vw;
     }
   }
 }
