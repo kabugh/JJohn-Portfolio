@@ -32,8 +32,8 @@ const routes: Array<RouteConfig> = [
     props: true,
     meta: {
       initialNav: true,
-      displayNav: false,
-      displaySlimNav: true,
+      displayNav: true,
+      displaySlimNav: false,
     }
   },
   {

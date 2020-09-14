@@ -5,7 +5,7 @@
         <div class="swiper-slide" v-for="slide in slides" :key="slide.title">
           <div class="swiper-slide__content">
             <img
-              :src="require(`@/assets/images/paintings/${slide.image}`)"
+              :src="require(`@/assets/images/slides/${slide.image}`)"
               :alt="slide.title"
             />
             <div class="swiper__description">
@@ -64,21 +64,21 @@ export default class Slider extends Vue {
       title: "Obrazy",
       description:
         "Glamora Collection X develops through themes such as nature.",
-      image: "1.jpg",
+      image: "slide1.jpg",
       slug: "/obrazy"
     },
     {
       title: "Rzeźby",
       description: "test",
-      image: "2.jpg",
+      image: "slide2.jpg",
       slug: "/rzezby"
-    },
-    {
-      title: "Bizuteria",
-      description: "test",
-      image: "3.jpg",
-      slug: "/bizuteria"
     }
+    // {
+    //   title: "Bizuteria",
+    //   description: "test",
+    //   image: "3.jpg",
+    //   slug: "/bizuteria"
+    // }
   ];
 
   get currentSlideIndex() {

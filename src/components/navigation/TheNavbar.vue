@@ -219,6 +219,12 @@ export default class TheNavbar extends Vue {
       max-width: 30vw;
       max-height: 10vh;
     }
+    @media (min-width: 800px) and (max-height: 400px) {
+      .logo {
+        max-width: 22vw;
+        max-height: 10vh;
+      }
+    }
   }
   @media (min-width: 1024px) {
     .logo {
