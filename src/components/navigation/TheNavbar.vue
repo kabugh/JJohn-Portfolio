@@ -25,15 +25,18 @@
       <img src="@/assets/images/logo.png" alt="logo" />
     </div>
     <div class="burger__wrapper">
-      <div
-        class="nav-mobile"
-        id="nav-icon"
-        :class="{ open: isNavOpen }"
-        @click="isNavOpen = !isNavOpen"
-      >
-        <span></span>
-        <span></span>
-        <span></span>
+      <div class="burger__items">
+        <div class="theme__switcher" @click="darkMode = !darkMode"></div>
+        <div
+          class="nav-mobile"
+          id="nav-icon"
+          :class="{ open: isNavOpen }"
+          @click="isNavOpen = !isNavOpen"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </div>
     </div>
   </nav>
@@ -95,6 +98,14 @@ export default class TheNavbar extends Vue {
 
   set isNavOpen(value) {
     this.$store.commit("setNav", value);
+  }
+
+  get darkMode(): boolean {
+    return this.$store.getters.darkMode;
+  }
+
+  set darkMode(value) {
+    this.$store.commit("setDarkMode", value);
   }
 }
 </script>
@@ -200,6 +211,21 @@ export default class TheNavbar extends Vue {
     align-items: center;
     flex: 1;
     height: 100%;
+    .burger__items {
+      @include flex;
+      flex-direction: row;
+      .theme__switcher {
+        background-image: url("../../assets/images/icons/sun.png");
+        @include backgroundDefault;
+        width: 28px;
+        height: 28px;
+        margin-right: 4vh;
+        margin-bottom: 5px;
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
     #nav-icon span {
       background-color: black;
     }
@@ -220,6 +246,9 @@ export default class TheNavbar extends Vue {
     }
   }
   .burger__wrapper {
+    .burger__items .theme__switcher {
+      background-image: url("../../assets/images/icons/moon.png");
+    }
     #nav-icon span {
       background-color: $dark-color;
     }

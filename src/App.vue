@@ -31,6 +31,15 @@ import NavOverlay from "./components/navigation/NavOverlay.vue";
 export default class App extends Vue {
   mounted() {
     this.setMode();
+    const darkModeMediaQuery = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    );
+    darkModeMediaQuery.addListener(e => {
+      const darkModeOn = e.matches;
+      console.log(`Dark mode is ${darkModeOn ? "🌒 on" : "☀️ off"}.`);
+      if (darkModeOn) this.darkMode = true;
+      else this.darkMode = false;
+    });
   }
   @Watch("darkMode")
   setMode() {
@@ -50,6 +59,10 @@ export default class App extends Vue {
 
   get darkMode(): boolean {
     return this.$store.getters.darkMode;
+  }
+
+  set darkMode(value) {
+    this.$store.commit("setDarkMode", value);
   }
 }
 </script>
