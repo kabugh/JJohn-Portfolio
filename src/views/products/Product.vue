@@ -962,5 +962,8 @@ export default class Product extends Vue {
 }
 .dark .product {
   color: $dark-color;
+  .product__container .product__content .creator__container {
+    background-color: $bg-dark;
+  }
 }
 </style>
