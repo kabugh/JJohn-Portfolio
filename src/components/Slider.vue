@@ -54,16 +54,16 @@ export default class Slider extends Vue {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   slider: any = {};
   mounted() {
-    this.$store.dispatch("fetchCategories").then(() => {
-      this.slider = new Swiper(".swiper-container", {
-        direction: "horizontal",
-        spaceBetween: 0,
-        grabCursor: true,
-        speed: 600,
-        slidesPerView: 1,
-        centeredSlides: true
-      });
+    // this.$store.dispatch("fetchCategories").then(() => {
+    this.slider = new Swiper(".swiper-container", {
+      direction: "horizontal",
+      spaceBetween: 0,
+      grabCursor: true,
+      speed: 600,
+      slidesPerView: 1,
+      centeredSlides: true
     });
+    // });
   }
   slides = [
     {
