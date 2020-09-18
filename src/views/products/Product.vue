@@ -74,7 +74,7 @@
             </div>
             <div
               class="scroll__indicator"
-              v-scroll-to="'.product__description'"
+              v-scroll-to="{ el: '.product__description', offset: 50 }"
             >
               <img src="@/assets/images/icons/mouse.png" alt="mouse" />
               <p>Scrolluj lub kliknij</p>
@@ -99,7 +99,10 @@
                   v-for="preview in backgroundPreviews"
                   :key="preview.title"
                   @click="activeBackground = preview"
-                  :class="{ active: activeBackground === preview }"
+                  :class="{
+                    active: activeBackground === preview,
+                    dark: darkMode
+                  }"
                 >
                   <img
                     :src="require(`@/assets/images/walls/${preview.image}`)"
@@ -115,7 +118,7 @@
                 <li
                   class="preview empty"
                   @click="activeFrame = null"
-                  :class="{ active: activeFrame === null }"
+                  :class="{ active: activeFrame === null, dark: darkMode }"
                 >
                   brak
                 </li>
@@ -124,7 +127,7 @@
                   v-for="frame in frames"
                   :key="frame.title"
                   @click="activeFrame = frame"
-                  :class="{ active: activeFrame === frame }"
+                  :class="{ active: activeFrame === frame, dark: darkMode }"
                 >
                   <img
                     :src="
@@ -154,7 +157,7 @@
                     activePasse = null;
                     passeRange = 0;
                   "
-                  :class="{ active: activePasse === null }"
+                  :class="{ active: activePasse === null, dark: darkMode }"
                 >
                   brak
                 </li>
@@ -163,7 +166,7 @@
                   v-for="(passe, j) in passes"
                   :key="j"
                   @click="activePasse = passe"
-                  :class="{ active: activePasse === passe }"
+                  :class="{ active: activePasse === passe, dark: darkMode }"
                   :style="{ backgroundColor: passe }"
                 ></li>
               </ul>
@@ -173,35 +176,38 @@
       </div>
     </div>
     <div class="product__details">
-      <div class="detailed__description author" v-if="product.credits">
+      <div
+        class="detailed__description author"
+        v-if="product.author || product.dealer"
+      >
         <ul>
-          <li>
-            <p><span>Autor</span> {{ product.credits.author }}</p>
+          <li v-if="product.author">
+            <p><span>Autor</span> {{ product.author }}</p>
           </li>
-          <li>
-            <p><span>Marszand</span> {{ product.credits.dealer }}</p>
+          <li v-if="product.dealer">
+            <p><span>Marszand</span> {{ product.dealer }}</p>
           </li>
         </ul>
       </div>
-      <div class="detailed__description">
+      <div class="detailed__description" v-if="product.details">
         <h3>Szczegóły</h3>
         <ul>
-          <li>
+          <li v-if="product.details.material">
             <p><span>Materiał</span> {{ product.details.material }}</p>
           </li>
-          <li>
+          <li v-if="product.details.artType">
             <p><span>Styl</span> {{ product.details.artType }}</p>
           </li>
-          <li>
+          <li v-if="product.details.technique">
             <p><span>Technika</span> {{ product.details.technique }}</p>
           </li>
-          <li>
+          <li v-if="product.details.width">
             <p><span>Szerokość</span> {{ product.details.width }}</p>
           </li>
-          <li>
+          <li v-if="product.details.height">
             <p><span>Wysokość</span> {{ product.details.height }}</p>
           </li>
-          <li>
+          <li v-if="product.details.releaseYear">
             <p><span>Rok wydania</span> {{ product.details.releaseYear }}</p>
           </li>
         </ul>
@@ -244,10 +250,8 @@ export default class Product extends Vue {
       height: "100 cm",
       releaseYear: 2019
     },
-    credits: {
-      author: "Barbara Jankowska John",
-      dealer: "Dariusz Adamowicz: +48604906519 galeria@sztukainspiracji.pl"
-    },
+    author: "Barbara Jankowska John",
+    dealer: "Dariusz Adamowicz: +48604906519 galeria@sztukainspiracji.pl",
     featuredOn: [
       "Wystawa towarzysząca Międzynarodowej Konferencji Germanistycznej 2019 Miejsce: Uniwersytet Wrocławski",
       "Wernisaż z muzyką // Barbara Jankowska-John & Avi Jazzar, Wrocławski Klub FORMATY, Wrocław 2019"
@@ -339,6 +343,7 @@ export default class Product extends Vue {
 
   scrollAnimation() {
     const verticalMobile = window.matchMedia("(max-width: 450px)");
+
     // const verticalBiggerScreen = window.matchMedia(
     //   "(min-width: 768px) and (orientation: portrait)"
     // );
@@ -377,6 +382,10 @@ export default class Product extends Vue {
             gsap.set(".scroll__indicator", {
               autoAlpha: 0
             });
+          } else {
+            gsap.set(".scroll__indicator", {
+              autoAlpha: 1
+            });
           }
 
           if (progress >= navThreshold && !this.displaySlimNav) {
@@ -401,7 +410,9 @@ export default class Product extends Vue {
   startCreator() {
     if (!this.isCreatorActive) {
       const mobileView = window.matchMedia("(max-width: 450px)");
-      this.$scrollTo(".product__description", 2000);
+      this.$scrollTo(".product__description", 2000, {
+        offset: 50
+      });
       this.isCreatorActive = true;
       const tl = gsap.timeline();
       if (!mobileView.matches) {
@@ -426,6 +437,10 @@ export default class Product extends Vue {
         autoAlpha: 1
       });
     }
+  }
+
+  get darkMode() {
+    return this.$store.getters.darkMode;
   }
 
   get displaySlimNav() {
@@ -685,7 +700,9 @@ export default class Product extends Vue {
           $horizontalPadding / 4;
         z-index: 2;
         margin-left: auto;
-        @media (min-width: 768px) and (min-height: 500px) {
+        @media (min-width: 768px) and (min-height: 500px),
+          (max-width: 850px) and (max-height: 450px) and (orientation: landscape),
+          (min-width: 700px) and (max-width: 720px) and (max-height: 540px) {
           position: absolute;
           background-color: transparent;
           right: 0;
@@ -744,6 +761,19 @@ export default class Product extends Vue {
                 cursor: pointer;
               }
 
+              &.dark {
+                border-color: $bg-dark-light;
+                &.active {
+                  border-color: $dark-color;
+                }
+                &.empty {
+                  background-color: $bg-dark-light;
+                }
+                &:hover {
+                  border-color: $dark-color;
+                }
+              }
+
               img {
                 width: 100%;
                 height: 100%;
@@ -771,10 +801,10 @@ export default class Product extends Vue {
           bottom: 3vh;
           padding: 0;
           h2 {
-            font-size: 2.5rem;
+            font-size: 2rem;
           }
           h4 {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
           }
         }
       }
@@ -783,8 +813,11 @@ export default class Product extends Vue {
         .product__description {
           @media (min-width: 800px) and (max-height: 400px) {
             min-width: 100%;
-            bottom: 3vh;
+            bottom: 1vh;
             padding: 0;
+          }
+          @media (max-width: 700px) and (max-height: 400px) {
+            bottom: -2vh;
           }
           @media (max-width: 650px) and (max-height: 350px) {
             min-width: 100%;
@@ -803,6 +836,20 @@ export default class Product extends Vue {
           .creator__content {
             .background__previews {
               grid-template-rows: repeat(auto-fit, minmax(2rem, 4rem));
+            }
+            @media (max-height: 400px) {
+              .background__previews:not(.border__previews):not(.passe__previews) {
+                grid-template-rows: repeat(auto-fit, minmax(1rem, 2rem));
+              }
+              .title {
+                font-size: 0.875rem;
+              }
+            }
+            @media (max-height: 350px) {
+              .background__previews.border__previews,
+              .background__previews.passe__previews {
+                grid-template-rows: repeat(auto-fit, 1.5rem);
+              }
             }
           }
         }
@@ -828,6 +875,9 @@ export default class Product extends Vue {
         .product__description {
           min-width: 100%;
           bottom: 1vh;
+          h2 {
+            font-size: 2.5rem;
+          }
         }
       }
       @media (min-width: 1280px) and (min-height: 500px) {
@@ -862,7 +912,7 @@ export default class Product extends Vue {
         li {
           line-height: 18px;
           margin-bottom: 15px;
-          padding: 0 $horizontalPadding / 2 10px $horizontalPadding / 8;
+          padding: 0 0 10px 0;
           border-bottom: 1px solid;
           p {
             font-size: 0.875rem;
@@ -871,8 +921,14 @@ export default class Product extends Vue {
               font-size: 0.75rem;
               font-weight: 600;
               text-transform: uppercase;
-              width: 150px;
+              width: 120px;
               display: inline-block;
+            }
+          }
+          @media (min-width: 360px) {
+            padding: 0 $horizontalPadding / 2 10px $horizontalPadding / 8;
+            p span {
+              width: 150px;
             }
           }
         }
@@ -903,5 +959,8 @@ export default class Product extends Vue {
       }
     }
   }
+}
+.dark .product {
+  color: $dark-color;
 }
 </style>

@@ -1,14 +1,36 @@
 <template>
   <section class="products">
     <div class="products__container">
-      <h1>Obrazy</h1>
+      <h1 data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
+        {{ $route.params.category }}
+      </h1>
       <div class="macy__grid">
+        <!-- <img
+          v-for="(work, i) in currentCategory.works"
+          :src="work.image.fields.file.url"
+          :key="work.catalogId + i"
+          @click="
+            $router.push({
+              path: `/obrazy/${i + 1}`,
+              params: { image: work.image.fields.file.url }
+            })
+          "
+          :alt="work.title"
+        /> -->
         <img
           v-for="(image, i) in images"
           :src="require(`@/assets/images/paintings/${image}`)"
           :key="i"
+          @click="
+            $router.push({
+              path: `/obrazy/${i + 1}`,
+              params: { image }
+            })
+          "
           :alt="i"
-          @click="$router.push({ path: `/obrazy/${i + 1}`, params: { image } })"
+          data-aos="fade-up"
+          data-aos-duration="800"
+          data-aos-delay="600"
         />
       </div>
     </div>
@@ -35,13 +57,26 @@ export default class Products extends Vue {
         450: 1
       }
     });
+    // this.$store
+    //   .dispatch("fetchCategory", this.$route.params.category)
+    //   .then(() => {
+    //     this.macy.runOnImageLoad(() => {
+    //       console.log("I only get called when all images are loaded");
+    //       this.macy.recalculate(true, true);
+    //     });
+    //     console.log("test");
+    //   });
 
-    this.macy.on(this.macy.constants.EVENT_IMAGE_COMPLETE, (ctx: any) => {
+    this.macy.on(this.macy.constants.EVENT_IMAGE_COMPLETE, () => {
       this.gridLoaded = true;
     });
   }
 
   currentImage = "";
+
+  // get currentCategory() {
+  //   return this.$store.getters.currentCategory;
+  // }
 
   images = [
     "1.jpg",
@@ -82,6 +117,7 @@ export default class Products extends Vue {
     h1 {
       font-size: 3rem;
       font-weight: 700;
+      text-transform: capitalize;
     }
     .macy__grid {
       margin: $verticalPadding 0;
@@ -104,5 +140,8 @@ export default class Products extends Vue {
       }
     }
   }
+}
+.dark .products {
+  color: $dark-color;
 }
 </style>

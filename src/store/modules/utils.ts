@@ -2,6 +2,7 @@ import gsap from "gsap";
 
 const state = {
     isNavOpen: false,
+    darkMode: true,
     loading: false,
     error: null,
     overlayLoading: true,
@@ -12,6 +13,9 @@ const state = {
   const mutations = {
     setNav(state: { isNavOpen: boolean }, payload: boolean) {
       state.isNavOpen = payload;
+    },
+    setDarkMode(state: { darkMode: boolean }, payload: boolean) {
+      state.darkMode = payload;
     },
     setLoading(state: { loading: boolean }, payload: boolean) {
       state.loading = payload;
@@ -36,6 +40,9 @@ const state = {
   const getters = {
     isNavOpen(state: { isNavOpen: boolean }) {
       return state.isNavOpen;
+    },
+    darkMode(state: { darkMode: boolean }) {
+      return state.darkMode;
     },
     loading(state: { loading: boolean }) {
       return state.loading;

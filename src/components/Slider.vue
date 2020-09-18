@@ -5,7 +5,7 @@
         <div class="swiper-slide" v-for="slide in slides" :key="slide.title">
           <div class="swiper-slide__content">
             <img
-              :src="require(`@/assets/images/slides/${slide.image}`)"
+              :src="require(`@/assets/images/slides/${slide.frontImage}`)"
               :alt="slide.title"
             />
             <div class="swiper__description">
@@ -29,7 +29,11 @@
                   <h1>{{ slide.title }}</h1>
                   <p>{{ slide.description }}</p>
                 </div>
-                <button class="dark thin" @click="$router.push(slide.slug)">
+                <button
+                  class="thin"
+                  :class="{ dark: !darkMode }"
+                  @click="$router.push(slide.slug)"
+                >
                   Zobacz więcej
                 </button>
               </div>
@@ -50,13 +54,15 @@ export default class Slider extends Vue {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   slider: any = {};
   mounted() {
-    this.slider = new Swiper(".swiper-container", {
-      direction: "horizontal",
-      spaceBetween: 0,
-      grabCursor: true,
-      speed: 600,
-      slidesPerView: 1,
-      centeredSlides: true
+    this.$store.dispatch("fetchCategories").then(() => {
+      this.slider = new Swiper(".swiper-container", {
+        direction: "horizontal",
+        spaceBetween: 0,
+        grabCursor: true,
+        speed: 600,
+        slidesPerView: 1,
+        centeredSlides: true
+      });
     });
   }
   slides = [
@@ -64,13 +70,13 @@ export default class Slider extends Vue {
       title: "Obrazy",
       description:
         "Glamora Collection X develops through themes such as nature.",
-      image: "slide1.jpg",
+      frontImage: "slide1.jpg",
       slug: "/obrazy"
     },
     {
       title: "Rzeźby",
       description: "test",
-      image: "slide2.jpg",
+      frontImage: "slide2.jpg",
       slug: "/rzezby"
     }
     // {
@@ -81,8 +87,16 @@ export default class Slider extends Vue {
     // }
   ];
 
+  // get slides() {
+  //   return this.$store.getters.categories;
+  // }
+
   get currentSlideIndex() {
     return this.slider.activeIndex;
+  }
+
+  get darkMode() {
+    return this.$store.getters.darkMode;
   }
 }
 </script>
@@ -128,7 +142,7 @@ export default class Slider extends Vue {
                 .angel__arrow {
                   @include backgroundDefault;
                   background-size: contain;
-                  background-image: url("../assets/images/icons/angel_arrow.png");
+                  background-image: url("../assets/images/icons/angel_arrow-black.png");
                   width: 28px;
                   height: 100%;
                   &:hover {
@@ -208,6 +222,26 @@ export default class Slider extends Vue {
           }
         }
       }
+    }
+  }
+}
+.dark
+  .hero
+  .swiper-container
+  .swiper-wrapper
+  .swiper-slide
+  .swiper-slide__content
+  .swiper__description {
+  .swiper__controls {
+    color: $dark-color;
+    .swiper__arrows .angel__arrow {
+      background-image: url("../assets/images/icons/angel_arrow.png");
+    }
+  }
+
+  .swiper__content--container {
+    .swiper__content {
+      color: $dark-color;
     }
   }
 }

@@ -96,7 +96,7 @@ export default class TheSlimNav extends Vue {
     .exit {
       width: 28px;
       height: 28px;
-      background-image: url("../../assets/images/icons/exit.png");
+      background-image: url("../../assets/images/icons/exit_black.png");
     }
   }
   .burger__wrapper {
@@ -105,6 +105,21 @@ export default class TheSlimNav extends Vue {
     align-items: center;
     #nav-icon span {
       background-color: black;
+    }
+  }
+}
+.dark .slimNav {
+  .back__wrapper {
+    .arrow {
+      background-image: url("../../assets/images/icons/arrow.png");
+    }
+    .exit {
+      background-image: url("../../assets/images/icons/exit.png");
+    }
+  }
+  .burger__wrapper {
+    #nav-icon span {
+      background-color: $dark-color;
     }
   }
 }

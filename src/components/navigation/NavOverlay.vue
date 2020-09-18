@@ -246,4 +246,13 @@ export default class NavOverlay extends Vue {
     }
   }
 }
+.dark .overlay .overlay__container {
+  color: $dark-color;
+  background-color: $bg-dark;
+  @media (min-width: 1280px) and (min-height: 500px) {
+    .overlay__wrapper .navItems .item:not(.socials__container) span:after {
+      background-color: $dark-color;
+    }
+  }
+}
 </style>

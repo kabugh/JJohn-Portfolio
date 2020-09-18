@@ -9,6 +9,11 @@ body {
   box-sizing: border-box;
   color: white;
   overflow-x: hidden;
+  transition: background-color 0.3s cubic-bezier(0.77, 0, 0.175, 1);
+  &.dark {
+    background-color: $bg-dark;
+    color: $dark-color;
+  }
 }
 
 ::selection {
