@@ -1,6 +1,6 @@
 export default interface ProductModel {
     title: string;
-    image: { fields: { file: { url: string } } };
+    image: { fields: { file: { url: string } } } | string;
     catalogId: number;
     description?: string;
     details?: {
