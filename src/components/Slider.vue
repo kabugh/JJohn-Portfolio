@@ -7,8 +7,9 @@
             <img
               :src="require(`@/assets/images/slides/${slide.frontImage}`)"
               :alt="slide.title"
+              ref="slideImage"
             />
-            <div class="swiper__description">
+            <div class="swiper__description" ref="slideDescription">
               <div class="swiper__controls">
                 <div class="swiper__counter">
                   <span>{{ currentSlideIndex + 1 }} / {{ slides.length }}</span>
@@ -45,9 +46,10 @@
   </header>
 </template>
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import Swiper from "swiper";
 import "swiper/swiper.scss";
+import gsap from "gsap";
 
 @Component
 export default class Slider extends Vue {
@@ -91,12 +93,42 @@ export default class Slider extends Vue {
   //   return this.$store.getters.categories;
   // }
 
+  @Watch("overlayLoading")
+  startAnimations() {
+    const slideImage = this.$refs.slideImage;
+    const slideDescription = this.$refs.slideDescription;
+    const tl = gsap.timeline();
+
+    tl.from(slideImage, {
+      duration: 1.25,
+      delay: 1,
+      opacity: 0,
+      y: -50,
+      ease: "power4"
+    }).to(slideImage, { y: 0 });
+
+    tl.from(
+      slideDescription,
+      {
+        duration: 1.25,
+        opacity: 0,
+        y: -50,
+        ease: "power4"
+      },
+      "-=1"
+    ).to(slideDescription, { y: 0 });
+  }
+
   get currentSlideIndex() {
     return this.slider.activeIndex;
   }
 
   get darkMode() {
     return this.$store.getters.darkMode;
+  }
+
+  get overlayLoading() {
+    return this.$store.getters.overlayLoading;
   }
 }
 </script>

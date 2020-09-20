@@ -15,25 +15,28 @@ const routes: Array<RouteConfig> = [
   {
     path: "/",
     name: "Home",
-    component: () => import(/* webpackChunkName: "products" */ "../views/Home.vue"),
+    component: () =>
+      import(/* webpackChunkName: "products" */ "../views/Home.vue"),
     beforeEnter: overlayGuard,
     meta: {
       initialNav: true,
       displayNav: true,
-      displaySlimNav: false,
+      displaySlimNav: false
     }
   },
   {
     path: "/:category",
     name: "Products",
     component: () =>
-      import(/* webpackChunkName: "products" */ "../views/products/Products.vue"),
+      import(
+        /* webpackChunkName: "products" */ "../views/products/Products.vue"
+      ),
     beforeEnter: overlayGuard,
     props: true,
     meta: {
       initialNav: true,
       displayNav: true,
-      displaySlimNav: false,
+      displaySlimNav: false
     }
   },
   {
@@ -46,7 +49,7 @@ const routes: Array<RouteConfig> = [
     meta: {
       initialNav: false,
       displayNav: false,
-      displaySlimNav: false,
+      displaySlimNav: false
     }
   }
 ];

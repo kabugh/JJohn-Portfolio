@@ -1,54 +1,49 @@
 <template>
   <section class="products">
     <div class="products__container">
-      <h1 data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
-        {{ $route.params.category }}
+      <h1 data-aos="fade-up" data-aos-delay="400">
+        {{ currentCategory.title }}
       </h1>
-      <div class="macy__grid">
-        <!-- <img
+      <div class="macy__grid" data-aos="fade-up" data-aos-delay="600">
+        <img
           v-for="(work, i) in currentCategory.works"
           :src="work.image.fields.file.url"
-          :key="work.catalogId + i"
-          @click="
-            $router.push({
-              path: `/obrazy/${i + 1}`,
-              params: { image: work.image.fields.file.url }
-            })
-          "
-          :alt="work.title"
-        /> -->
-        <img
-          v-for="(image, i) in images"
-          :src="require(`@/assets/images/paintings/${image}`)"
           :key="i"
           @click="
             $router.push({
-              path: `/obrazy/${i + 1}`,
-              params: { image }
+              name: 'Product',
+              params: { id: work.catalogId, product: work }
             })
           "
-          :alt="i"
-          data-aos="fade-up"
-          data-aos-duration="800"
-          data-aos-delay="600"
+          :alt="work.title"
         />
       </div>
+      <!-- <LoadingComponent /> -->
     </div>
   </section>
 </template>
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import Macy from "macy";
+import LoadingComponent from "@/components/LoadingComponent.vue";
 
-@Component
+@Component({
+  components: { LoadingComponent }
+})
 export default class Products extends Vue {
   macy: any = {};
-  gridLoaded = false;
-  mounted() {
+
+  async mounted() {
+    await this.$store.dispatch("fetchCategory", this.$route.params.category);
+  }
+
+  @Watch("currentCategory")
+  initGrid() {
+    console.log("reinit");
     this.macy = Macy({
       container: ".macy__grid",
       trueOrder: false,
-      waitForImages: true,
+      waitForImages: false,
       margin: 30,
       columns: 4,
       breakAt: {
@@ -57,54 +52,17 @@ export default class Products extends Vue {
         450: 1
       }
     });
-    // this.$store
-    //   .dispatch("fetchCategory", this.$route.params.category)
-    //   .then(() => {
-    //     this.macy.runOnImageLoad(() => {
-    //       console.log("I only get called when all images are loaded");
-    //       this.macy.recalculate(true, true);
-    //     });
-    //     console.log("test");
-    //   });
-
-    this.macy.on(this.macy.constants.EVENT_IMAGE_COMPLETE, () => {
-      this.gridLoaded = true;
-    });
   }
 
   currentImage = "";
 
-  // get currentCategory() {
-  //   return this.$store.getters.currentCategory;
-  // }
+  get currentCategory() {
+    return this.$store.getters.currentCategory;
+  }
 
-  images = [
-    "1.jpg",
-    "2.jpg",
-    "3.jpg",
-    "4.jpg",
-    "5.jpg",
-    "6.jpg",
-    "7.jpg",
-    "8.jpg",
-    "9.jpg",
-    "10.jpg",
-    "11.jpg",
-    "12.jpg",
-    "13.jpg",
-    "14.jpg",
-    "15.jpg",
-    "16.jpg",
-    "17.jpg",
-    "18.jpg",
-    "19.jpg",
-    "20.jpg",
-    "21.jpg",
-    "22.jpg",
-    "23.jpg",
-    "24.jpg",
-    "25.jpg"
-  ];
+  get loading() {
+    return this.$store.getters.loading;
+  }
 }
 </script>
 <style lang="scss">
@@ -114,6 +72,7 @@ export default class Products extends Vue {
   color: black;
   .products__container {
     padding: $verticalPadding * 5 / 2 $horizontalPadding * 3 / 4;
+    overflow: hidden;
     h1 {
       font-size: 3rem;
       font-weight: 700;
@@ -121,8 +80,9 @@ export default class Products extends Vue {
     }
     .macy__grid {
       margin: $verticalPadding 0;
+      overflow: hidden;
       img {
-        max-width: 100%;
+        width: 100%;
         &:hover {
           cursor: pointer;
         }

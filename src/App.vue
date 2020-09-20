@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <!-- <LoadingOverlay /> -->
+    <LoadingOverlay />
     <TheNavbar />
     <TheSlimNav />
     <transition name="navOverlay">
@@ -19,14 +19,14 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Watch } from "vue-property-decorator";
-// import LoadingOverlay from "./components/LoadingOverlay.vue";
+import LoadingOverlay from "./components/LoadingOverlay.vue";
 import TheNavbar from "./components/navigation/TheNavbar.vue";
 import TheSlimNav from "./components/navigation/TheSlimNav.vue";
 import NavOverlay from "./components/navigation/NavOverlay.vue";
 // import TheFooter from "./components/TheFooter.vue";
 
 @Component({
-  components: { TheNavbar, TheSlimNav, NavOverlay }
+  components: { LoadingOverlay, TheNavbar, TheSlimNav, NavOverlay }
 })
 export default class App extends Vue {
   mounted() {

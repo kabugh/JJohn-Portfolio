@@ -17,16 +17,16 @@ Vue.use(VueScrollTo, {
   duration: 2000,
   onStart: () => {
     if (store.getters.isNavOpen) store.commit("setNav", false);
-    if(store.getters.isCreatorActive) store.commit("setCreatorActive", false);
+    if (store.getters.isCreatorActive) store.commit("setCreatorActive", false);
   }
 });
 
 import AOS from "aos";
 import "aos/dist/aos.css";
 AOS.init({
-  easing: "ease-in-out-quart"
+  easing: "ease-in-out-quart",
+  duration: 800
 });
-
 
 Vue.config.productionTip = false;
 

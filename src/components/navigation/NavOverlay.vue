@@ -38,19 +38,19 @@ export default class NavOverlay extends Vue {
     },
     {
       title: "Obrazy",
-      slug: "/produkty/obrazy"
+      slug: "/obrazy"
     },
     {
       title: "Rzeźby",
-      slug: "/produkty/rzezby"
+      slug: "/rzezby"
     },
     {
       title: "Biżuteria",
-      slug: "/produkty/bizuteria"
+      slug: "/bizuteria"
     },
     {
       title: "Reprodukcje",
-      slug: "/produkty/reprodukcje"
+      slug: "/reprodukcje"
     },
     {
       title: "O Autorce",

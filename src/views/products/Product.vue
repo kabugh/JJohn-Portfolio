@@ -1,6 +1,6 @@
 <template>
   <section class="product">
-    <div class="product__container">
+    <div class="product__container" v-if="product">
       <div class="product__content">
         <!-- <VueDragResize
           :isActive="isActive"
@@ -47,10 +47,7 @@
               }"
               :style="{
                 transform: `scale(${1 - passeRange * 0.05})`,
-                backgroundImage:
-                  'url(' +
-                  require(`@/assets/images/paintings/${product.image}.jpg`) +
-                  ')'
+                backgroundImage: `url(${product.image.fields.file.url})`
               }"
             ></div>
             <div
@@ -74,6 +71,7 @@
             </div>
             <div
               class="scroll__indicator"
+              :class="{ active: displayScrollIndicator }"
               v-scroll-to="{ el: '.product__description', offset: 50 }"
             >
               <img src="@/assets/images/icons/mouse.png" alt="mouse" />
@@ -88,6 +86,9 @@
             <h2>{{ product.title }}</h2>
             <h4>Numer katalogowy: {{ product.catalogId }}</h4>
           </div>
+          <!-- <div class="creatorPopUp__container">
+            <p>Sprawdź dzieło w wizualizatorze</p>
+          </div> -->
         </div>
         <div class="creator__container" ref="creator">
           <div class="creator__content">
@@ -192,30 +193,29 @@
       <div class="detailed__description" v-if="product.details">
         <h3>Szczegóły</h3>
         <ul>
-          <li v-if="product.details.material">
-            <p><span>Materiał</span> {{ product.details.material }}</p>
+          <li v-if="product.details.fields.material">
+            <p><span>Materiał</span> {{ product.details.fields.material }}</p>
           </li>
-          <li v-if="product.details.artType">
-            <p><span>Styl</span> {{ product.details.artType }}</p>
+          <li v-if="product.details.fields.artType">
+            <p><span>Styl</span> {{ product.details.fields.artType }}</p>
           </li>
-          <li v-if="product.details.technique">
-            <p><span>Technika</span> {{ product.details.technique }}</p>
+          <li v-if="product.details.fields.technique">
+            <p><span>Technika</span> {{ product.details.fields.technique }}</p>
           </li>
-          <li v-if="product.details.width">
-            <p><span>Szerokość</span> {{ product.details.width }}</p>
+          <li v-if="product.details.fields.width">
+            <p><span>Szerokość</span> {{ product.details.fields.width }}</p>
           </li>
-          <li v-if="product.details.height">
-            <p><span>Wysokość</span> {{ product.details.height }}</p>
+          <li v-if="product.details.fields.height">
+            <p><span>Wysokość</span> {{ product.details.fields.height }}</p>
           </li>
-          <li v-if="product.details.releaseYear">
-            <p><span>Rok wydania</span> {{ product.details.releaseYear }}</p>
+          <li v-if="product.details.fields.releaseYear">
+            <p>
+              <span>Rok wydania</span> {{ product.details.fields.releaseYear }}
+            </p>
           </li>
         </ul>
       </div>
-      <div
-        class="detailed__description featuredOn"
-        v-if="product.featuredOn.length > 0"
-      >
+      <div class="detailed__description featuredOn" v-if="product.featuredOn">
         <h3>Prezentowany na wystawach</h3>
         <ul>
           <li v-for="(item, index) in product.featuredOn" :key="index">
@@ -227,7 +227,7 @@
   </section>
 </template>
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import ProductModel from "@/utils/typings/ProductModel";
 import gsap from "gsap";
 
@@ -237,26 +237,27 @@ import VueDraggableResizable from "vue-draggable-resizable";
   components: { VueDraggableResizable }
 })
 export default class Product extends Vue {
-  product: ProductModel = {
-    title: "Zamieniony w skałę poruszam ustami",
-    image: this.$route.params.id,
-    catalogId: 155,
-    description: "obraz",
-    details: {
-      material: "Płótno",
-      artType: "Abstrakcja",
-      technique: "akryl na płótnie",
-      width: "100 cm",
-      height: "100 cm",
-      releaseYear: 2019
-    },
-    author: "Barbara Jankowska John",
-    dealer: "Dariusz Adamowicz: +48604906519 galeria@sztukainspiracji.pl",
-    featuredOn: [
-      "Wystawa towarzysząca Międzynarodowej Konferencji Germanistycznej 2019 Miejsce: Uniwersytet Wrocławski",
-      "Wernisaż z muzyką // Barbara Jankowska-John & Avi Jazzar, Wrocławski Klub FORMATY, Wrocław 2019"
-    ]
-  };
+  @Prop({ required: true }) product!: ProductModel;
+  // product: ProductModel = {
+  //   title: "Zamieniony w skałę poruszam ustami",
+  //   image: this.$route.params.id,
+  //   catalogId: 155,
+  //   description: "obraz",
+  //   details: {
+  //     material: "Płótno",
+  //     artType: "Abstrakcja",
+  //     technique: "akryl na płótnie",
+  //     width: "100 cm",
+  //     height: "100 cm",
+  //     releaseYear: 2019
+  //   },
+  //   author: "Barbara Jankowska John",
+  //   dealer: "Dariusz Adamowicz: +48604906519 galeria@sztukainspiracji.pl",
+  //   featuredOn: [
+  //     "Wystawa towarzysząca Międzynarodowej Konferencji Germanistycznej 2019 Miejsce: Uniwersytet Wrocławski",
+  //     "Wernisaż z muzyką // Barbara Jankowska-John & Avi Jazzar, Wrocławski Klub FORMATY, Wrocław 2019"
+  //   ]
+  // };
 
   frameDirections = ["top", "bottom", "left", "right", "tl", "tr", "bl", "br"];
   backgroundPreviews = [
@@ -284,6 +285,7 @@ export default class Product extends Vue {
   activePasse = this.passes[0];
   passeRange = 1;
 
+  displayScrollIndicator = true;
   productDescription = false;
   isActive = false;
 
@@ -311,27 +313,6 @@ export default class Product extends Vue {
       this.imageWidth = image.width;
       this.imageHeight = image.height;
     });
-  }
-
-  onResize(x: number, y: number, width: number, height: number) {
-    const initialWidth = this.width;
-    const initialHeight = this.height;
-    this.x = x;
-    this.y = y;
-    this.width = width > 0 ? width : initialWidth;
-    this.height = height > 0 ? height : initialHeight;
-  }
-
-  onDrag(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
-
-  changeSize() {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const image = (this.$refs.image as any).getBoundingClientRect();
-    this.imageWidth = image.width;
-    this.imageHeight = image.height;
   }
 
   @Watch("isCreatorActive")
@@ -378,15 +359,16 @@ export default class Product extends Vue {
           const navThreshold = verticalMobile.matches ? 0.8 : 0.6;
           const descThreshold = verticalMobile.matches ? 0.8 : 0.85;
 
-          if (progress >= scrollThreshold) {
-            gsap.set(".scroll__indicator", {
-              autoAlpha: 0
-            });
-          } else {
-            gsap.set(".scroll__indicator", {
-              autoAlpha: 1
-            });
+          if (progress >= scrollThreshold && this.displayScrollIndicator) {
+            this.displayScrollIndicator = false;
+          } else if (
+            progress < scrollThreshold &&
+            !this.displayScrollIndicator
+          ) {
+            this.displayScrollIndicator = true;
           }
+
+          console.log(navThreshold, progress);
 
           if (progress >= navThreshold && !this.displaySlimNav) {
             this.displaySlimNav = true;
@@ -488,6 +470,23 @@ export default class Product extends Vue {
         height: 100vh;
         z-index: 1;
         @include flex;
+        .creatorPopUp__container {
+          background-color: $bg-dark-light;
+          color: white;
+          max-width: $verticalPadding * 3;
+          position: absolute;
+          right: $verticalPadding;
+          bottom: $verticalPadding;
+          @include flex;
+          border-radius: 10px;
+          padding: $verticalPadding / 4;
+          box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.15);
+          p {
+            text-align: center;
+            line-height: 1.25;
+            font-size: 0.875rem;
+          }
+        }
       }
       .product__background {
         z-index: 2;
@@ -638,12 +637,17 @@ export default class Product extends Vue {
         .scroll__indicator {
           position: absolute;
           bottom: 0;
+          opacity: 0;
           z-index: 2;
           padding-bottom: $verticalPadding / 4;
           @include flex;
           flex-direction: row;
-          transition: all 0.2s cubic-bezier(0.65, 0, 0.35, 1);
-
+          transition: all 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+          transform: translateY(10px);
+          &.active {
+            transform: translateY(0);
+            opacity: 1;
+          }
           &:hover {
             cursor: pointer;
           }

@@ -126,7 +126,7 @@ export default class TheNavbar extends Vue {
   position: fixed;
   padding: 15px 6vw;
   z-index: 100;
-  transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1),
+  transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1),
     background-color 0.3s cubic-bezier(0.77, 0, 0.175, 1);
   display: flex;
   justify-content: flex-start;
