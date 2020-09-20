@@ -31,6 +31,7 @@ import LoadingComponent from "@/components/LoadingComponent.vue";
   components: { LoadingComponent }
 })
 export default class Products extends Vue {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   macy: any = {};
 
   async mounted() {
@@ -39,7 +40,6 @@ export default class Products extends Vue {
 
   @Watch("currentCategory")
   initGrid() {
-    console.log("reinit");
     this.macy = Macy({
       container: ".macy__grid",
       trueOrder: false,

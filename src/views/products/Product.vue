@@ -368,8 +368,6 @@ export default class Product extends Vue {
             this.displayScrollIndicator = true;
           }
 
-          console.log(navThreshold, progress);
-
           if (progress >= navThreshold && !this.displaySlimNav) {
             this.displaySlimNav = true;
           } else if (progress < navThreshold && this.displaySlimNav) {
