@@ -36,10 +36,6 @@ export default class Products extends Vue {
 
   async mounted() {
     await this.$store.dispatch("fetchCategory", this.$route.params.category);
-  }
-
-  @Watch("currentCategory")
-  initGrid() {
     this.macy = Macy({
       container: ".macy__grid",
       trueOrder: false,
@@ -54,8 +50,6 @@ export default class Products extends Vue {
     });
   }
 
-  currentImage = "";
-
   get currentCategory() {
     return this.$store.getters.currentCategory;
   }
@@ -69,6 +63,7 @@ export default class Products extends Vue {
 @import "@/assets/scss/global.scss";
 .products {
   width: 100%;
+  min-height: 100vh;
   color: black;
   .products__container {
     padding: $verticalPadding * 5 / 2 $horizontalPadding * 3 / 4;
@@ -82,7 +77,9 @@ export default class Products extends Vue {
       margin: $verticalPadding 0;
       overflow: hidden;
       img {
-        width: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
         &:hover {
           cursor: pointer;
         }

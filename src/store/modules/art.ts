@@ -56,7 +56,7 @@ const actions = {
     if (state.categories.length === 0 || state.currentCategory.slug !== slug) {
       commit("setLoading", true);
       commit("clearError");
-      client
+      return client
         .getEntries({
           order: "sys.updatedAt",
           content_type: "category",
