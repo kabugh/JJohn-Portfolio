@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <!-- <LoadingOverlay /> -->
+    <LoadingOverlay />
     <TheNavbar />
     <TheSlimNav />
     <transition name="navOverlay">
