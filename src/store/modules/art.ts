@@ -1,4 +1,5 @@
 import Category from "@/utils/typings/Category";
+import ProductModel from '@/utils/typings/ProductModel';
 /* eslint-disable @typescript-eslint/no-var-requires */
 const contentful = require("contentful");
 
@@ -9,7 +10,8 @@ const client = contentful.createClient({
 
 const state = {
   categories: [],
-  currentCategory: {}
+  currentCategory: {},
+  currentWork: {}
 };
 
 const mutations = {
@@ -18,6 +20,9 @@ const mutations = {
   },
   setCurrentCategory(state: { currentCategory: Category }, payload: any) {
     state.currentCategory = payload;
+  },
+  setCurrentWork(state: { currentWork: ProductModel }, payload: any) {
+    state.currentWork = payload;
   }
 };
 
@@ -27,6 +32,9 @@ const getters = {
   },
   currentCategory(state: { currentCategory: Category }) {
     return state.currentCategory;
+  },
+  currentWork(state: { currentWork: ProductModel }) {
+    return state.currentWork;
   }
 };
 
@@ -76,6 +84,28 @@ const actions = {
         (category: Category) => category.slug === slug
       );
       commit("setCurrentCategory", foundCategory);
+    }
+  },
+  fetchWork({ commit, state }: any, payload: { category: string, catalogId: number }) {
+    if (state.categories.length === 0 || state.currentWork.category !== payload.category && state.currentWork.catalogId !== payload.catalogId) {
+      commit("setLoading", true);
+      commit("clearError");
+      return client
+        .getEntries({
+          order: "sys.updatedAt",
+          content_type: "art",
+          "fields.catalogId": payload.catalogId,
+          include: 2
+        })
+        .then((entries: { items: any[] }) => {
+          commit("setCurrentWork", entries.items[0].fields);
+          commit("setLoading", false);
+        });
+    } else {
+      const foundWork = state.currentCategory.works.find(
+        (work: ProductModel) => work.catalogId === payload.catalogId
+      );
+      commit("setCurrentWork", foundWork);
     }
   }
 };

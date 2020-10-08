@@ -1,6 +1,6 @@
 <template>
   <section class="product">
-    <div class="product__container" v-if="product">
+    <div class="product__container" v-if="currentWork">
       <div class="product__content">
         <!-- <VueDragResize
           :isActive="isActive"
@@ -47,7 +47,7 @@
               }"
               :style="{
                 transform: `scale(${1 - passeRange * 0.05})`,
-                backgroundImage: `url(${product.image.fields.file.url})`
+                backgroundImage: `url(${currentWork.image.fields.file.url})`
               }"
             ></div>
             <div
@@ -83,8 +83,8 @@
             :class="{ active: productDescription }"
             @click="startCreator"
           >
-            <h2>{{ product.title }}</h2>
-            <h4>Numer katalogowy: {{ product.catalogId }}</h4>
+            <h2>{{ currentWork.title }}</h2>
+            <h4>Numer katalogowy: {{ currentWork.catalogId }}</h4>
           </div>
           <!-- <div class="creatorPopUp__container">
             <p>Sprawdź dzieło w wizualizatorze</p>
@@ -179,46 +179,57 @@
     <div class="product__details">
       <div
         class="detailed__description author"
-        v-if="product.author || product.dealer"
+        v-if="currentWork && (currentWork.author || currentWork.dealer)"
       >
         <ul>
-          <li v-if="product.author">
-            <p><span>Autor</span> {{ product.author }}</p>
+          <li v-if="currentWork.author">
+            <p><span>Autor</span> {{ currentWork.author }}</p>
           </li>
-          <li v-if="product.dealer">
-            <p><span>Marszand</span> {{ product.dealer }}</p>
+          <li v-if="currentWork.dealer">
+            <p><span>Marszand</span> {{ currentWork.dealer }}</p>
           </li>
         </ul>
       </div>
-      <div class="detailed__description" v-if="product.details">
+      <div
+        class="detailed__description"
+        v-if="currentWork && currentWork.details"
+      >
         <h3>Szczegóły</h3>
         <ul>
-          <li v-if="product.details.fields.material">
-            <p><span>Materiał</span> {{ product.details.fields.material }}</p>
-          </li>
-          <li v-if="product.details.fields.artType">
-            <p><span>Styl</span> {{ product.details.fields.artType }}</p>
-          </li>
-          <li v-if="product.details.fields.technique">
-            <p><span>Technika</span> {{ product.details.fields.technique }}</p>
-          </li>
-          <li v-if="product.details.fields.width">
-            <p><span>Szerokość</span> {{ product.details.fields.width }}</p>
-          </li>
-          <li v-if="product.details.fields.height">
-            <p><span>Wysokość</span> {{ product.details.fields.height }}</p>
-          </li>
-          <li v-if="product.details.fields.releaseYear">
+          <li v-if="currentWork.details.fields.material">
             <p>
-              <span>Rok wydania</span> {{ product.details.fields.releaseYear }}
+              <span>Materiał</span> {{ currentWork.details.fields.material }}
+            </p>
+          </li>
+          <li v-if="currentWork.details.fields.artType">
+            <p><span>Styl</span> {{ currentWork.details.fields.artType }}</p>
+          </li>
+          <li v-if="currentWork.details.fields.technique">
+            <p>
+              <span>Technika</span> {{ currentWork.details.fields.technique }}
+            </p>
+          </li>
+          <li v-if="currentWork.details.fields.width">
+            <p><span>Szerokość</span> {{ currentWork.details.fields.width }}</p>
+          </li>
+          <li v-if="currentWork.details.fields.height">
+            <p><span>Wysokość</span> {{ currentWork.details.fields.height }}</p>
+          </li>
+          <li v-if="currentWork.details.fields.releaseYear">
+            <p>
+              <span>Rok wydania</span>
+              {{ currentWork.details.fields.releaseYear }}
             </p>
           </li>
         </ul>
       </div>
-      <div class="detailed__description featuredOn" v-if="product.featuredOn">
+      <div
+        class="detailed__description featuredOn"
+        v-if="currentWork && currentWork.featuredOn"
+      >
         <h3>Prezentowany na wystawach</h3>
         <ul>
-          <li v-for="(item, index) in product.featuredOn" :key="index">
+          <li v-for="(item, index) in currentWork.featuredOn" :key="index">
             <p>{{ item }}</p>
           </li>
         </ul>
@@ -237,7 +248,7 @@ import VueDraggableResizable from "vue-draggable-resizable";
   components: { VueDraggableResizable }
 })
 export default class Product extends Vue {
-  @Prop({ required: true }) product!: ProductModel;
+  @Prop() product!: ProductModel;
   // product: ProductModel = {
   //   title: "Zamieniony w skałę poruszam ustami",
   //   image: this.$route.params.id,
@@ -281,9 +292,9 @@ export default class Product extends Vue {
 
   activeArt = "";
   activeBackground = this.backgroundPreviews[0];
-  activeFrame = this.frames[0];
-  activePasse = this.passes[0];
-  passeRange = 1;
+  activeFrame = null;
+  activePasse = null;
+  passeRange = 0;
 
   displayScrollIndicator = true;
   productDescription = false;
@@ -301,7 +312,17 @@ export default class Product extends Vue {
     this.isCreatorActive = false;
   }
 
-  mounted() {
+  async mounted() {
+    if (this.product === undefined) {
+      await this.$store.dispatch("fetchWork", {
+        category: this.$route.params.category,
+        catalogId: this.$route.params.id
+      });
+      // this.product = this.currentWork;
+    } else {
+      this.currentWork = this.product;
+    }
+
     this.isCreatorActive = false;
     this.scrollAnimation();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -417,6 +438,14 @@ export default class Product extends Vue {
         autoAlpha: 1
       });
     }
+  }
+
+  get currentWork() {
+    return this.$store.getters.currentWork;
+  }
+
+  set currentWork(value) {
+    this.$store.commit("setCurrentWork", value);
   }
 
   get darkMode() {
