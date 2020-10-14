@@ -1,14 +1,7 @@
 <template>
   <section class="product">
-    <div class="product__container" v-if="currentWork">
+    <div class="product__container" v-if="product">
       <div class="product__content">
-        <!-- <VueDragResize
-          :isActive="isActive"
-          :w="imageWidth"
-          :h="imageHeight"
-          @dragging="resize"
-          :parentLimitation="true"
-        > -->
         <div class="product__background--container">
           <div
             class="product__background"
@@ -19,24 +12,11 @@
                 ')'
             }"
             ref="background"
+          ></div>
+          <div
+            class="product__image--wrapper"
+            :class="dimensions(product.image.fields.file.details.image)"
           >
-            <!-- <vue-draggable-resizable
-            :w="imageWidth"
-            :h="imageHeight"
-            @dragging="onDrag"
-            @resizing="onResize"
-            :parent="true"
-            :draggable="isActive"
-            :resizable="false"
-            :active="isActive"
-            class="product__image--container"
-          >
-            <div class="product__image--wrapper">
-              <div class="product__image" ref="image"></div>
-            </div>
-          </vue-draggable-resizable> -->
-          </div>
-          <div class="product__image--wrapper horizontal">
             <div
               class="product__image"
               ref="image"
@@ -47,11 +27,15 @@
               }"
               :style="{
                 transform: `scale(${1 - passeRange * 0.05})`,
-                backgroundImage: `url(${currentWork.image.fields.file.url})`
+                backgroundImage: `url(${product.image.fields.file.url})`
               }"
             ></div>
             <div
               class="passe-partout"
+              :class="{
+                frame__active: activeFrame !== null,
+                transitions__active: activeFrame !== null
+              }"
               :style="{
                 backgroundColor: this.activePasse
               }"
@@ -83,8 +67,8 @@
             :class="{ active: productDescription }"
             @click="startCreator"
           >
-            <h2>{{ currentWork.title }}</h2>
-            <h4>Numer katalogowy: {{ currentWork.catalogId }}</h4>
+            <h2>{{ product.title }}</h2>
+            <h4>Numer katalogowy: {{ product.catalogId }}</h4>
           </div>
           <!-- <div class="creatorPopUp__container">
             <p>Sprawdź dzieło w wizualizatorze</p>
@@ -140,7 +124,7 @@
               </ul>
             </div>
             <div class="passe__container">
-              <div class="title__container">
+              <div class="passeTitle__container">
                 <p class="title">Dostosuj passe-partout</p>
                 <input
                   type="range"
@@ -179,57 +163,50 @@
     <div class="product__details">
       <div
         class="detailed__description author"
-        v-if="currentWork && (currentWork.author || currentWork.dealer)"
+        v-if="product && (product.author || product.dealer)"
       >
         <ul>
-          <li v-if="currentWork.author">
-            <p><span>Autor</span> {{ currentWork.author }}</p>
+          <li v-if="product.author">
+            <p><span>Autor</span> {{ product.author }}</p>
           </li>
-          <li v-if="currentWork.dealer">
-            <p><span>Marszand</span> {{ currentWork.dealer }}</p>
+          <li v-if="product.dealer">
+            <p><span>Marszand</span> {{ product.dealer }}</p>
           </li>
         </ul>
       </div>
-      <div
-        class="detailed__description"
-        v-if="currentWork && currentWork.details"
-      >
+      <div class="detailed__description" v-if="product && product.details">
         <h3>Szczegóły</h3>
         <ul>
-          <li v-if="currentWork.details.fields.material">
-            <p>
-              <span>Materiał</span> {{ currentWork.details.fields.material }}
-            </p>
+          <li v-if="product.details.fields.material">
+            <p><span>Materiał</span> {{ product.details.fields.material }}</p>
           </li>
-          <li v-if="currentWork.details.fields.artType">
-            <p><span>Styl</span> {{ currentWork.details.fields.artType }}</p>
+          <li v-if="product.details.fields.artType">
+            <p><span>Styl</span> {{ product.details.fields.artType }}</p>
           </li>
-          <li v-if="currentWork.details.fields.technique">
-            <p>
-              <span>Technika</span> {{ currentWork.details.fields.technique }}
-            </p>
+          <li v-if="product.details.fields.technique">
+            <p><span>Technika</span> {{ product.details.fields.technique }}</p>
           </li>
-          <li v-if="currentWork.details.fields.width">
-            <p><span>Szerokość</span> {{ currentWork.details.fields.width }}</p>
+          <li v-if="product.details.fields.width">
+            <p><span>Szerokość</span> {{ product.details.fields.width }}</p>
           </li>
-          <li v-if="currentWork.details.fields.height">
-            <p><span>Wysokość</span> {{ currentWork.details.fields.height }}</p>
+          <li v-if="product.details.fields.height">
+            <p><span>Wysokość</span> {{ product.details.fields.height }}</p>
           </li>
-          <li v-if="currentWork.details.fields.releaseYear">
+          <li v-if="product.details.fields.releaseYear">
             <p>
               <span>Rok wydania</span>
-              {{ currentWork.details.fields.releaseYear }}
+              {{ product.details.fields.releaseYear }}
             </p>
           </li>
         </ul>
       </div>
       <div
         class="detailed__description featuredOn"
-        v-if="currentWork && currentWork.featuredOn"
+        v-if="product && product.featuredOn"
       >
         <h3>Prezentowany na wystawach</h3>
         <ul>
-          <li v-for="(item, index) in currentWork.featuredOn" :key="index">
+          <li v-for="(item, index) in product.featuredOn" :key="index">
             <p>{{ item }}</p>
           </li>
         </ul>
@@ -249,26 +226,6 @@ import VueDraggableResizable from "vue-draggable-resizable";
 })
 export default class Product extends Vue {
   @Prop() product!: ProductModel;
-  // product: ProductModel = {
-  //   title: "Zamieniony w skałę poruszam ustami",
-  //   image: this.$route.params.id,
-  //   catalogId: 155,
-  //   description: "obraz",
-  //   details: {
-  //     material: "Płótno",
-  //     artType: "Abstrakcja",
-  //     technique: "akryl na płótnie",
-  //     width: "100 cm",
-  //     height: "100 cm",
-  //     releaseYear: 2019
-  //   },
-  //   author: "Barbara Jankowska John",
-  //   dealer: "Dariusz Adamowicz: +48604906519 galeria@sztukainspiracji.pl",
-  //   featuredOn: [
-  //     "Wystawa towarzysząca Międzynarodowej Konferencji Germanistycznej 2019 Miejsce: Uniwersytet Wrocławski",
-  //     "Wernisaż z muzyką // Barbara Jankowska-John & Avi Jazzar, Wrocławski Klub FORMATY, Wrocław 2019"
-  //   ]
-  // };
 
   frameDirections = ["top", "bottom", "left", "right", "tl", "tr", "bl", "br"];
   backgroundPreviews = [
@@ -300,14 +257,6 @@ export default class Product extends Vue {
   productDescription = false;
   isActive = false;
 
-  width = 0;
-  height = 0;
-  x = 0;
-  y = 0;
-
-  imageWidth = 200;
-  imageHeight = 200;
-
   created() {
     this.isCreatorActive = false;
   }
@@ -318,22 +267,11 @@ export default class Product extends Vue {
         category: this.$route.params.category,
         catalogId: this.$route.params.id
       });
-      // this.product = this.currentWork;
-    } else {
-      this.currentWork = this.product;
-    }
+      this.product = this.currentWork;
+      this.scrollAnimation();
+    } else this.scrollAnimation();
 
     this.isCreatorActive = false;
-    this.scrollAnimation();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const image = (this.$refs.image as any).getBoundingClientRect();
-    this.imageWidth = image.width;
-    this.imageHeight = image.height;
-
-    window.addEventListener("resize", () => {
-      this.imageWidth = image.width;
-      this.imageHeight = image.height;
-    });
   }
 
   @Watch("isCreatorActive")
@@ -440,6 +378,9 @@ export default class Product extends Vue {
     }
   }
 
+  dimensions(image: { width: number; height: number }) {
+    return image.width > image.height ? "horizontal" : "vertical";
+  }
   get currentWork() {
     return this.$store.getters.currentWork;
   }
@@ -469,7 +410,7 @@ export default class Product extends Vue {
   }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 @import "@/assets/scss/global.scss";
 .product {
   width: 100%;
@@ -538,9 +479,7 @@ export default class Product extends Vue {
         transform-origin: center 25%;
         transition: background-color 0.15s linear 0.3s;
         &.vertical {
-          margin: 0 auto;
-          // width: 100%;
-          // height: 150%;
+          // margin: 0 auto;
         }
         .product__image {
           z-index: 2;
@@ -553,20 +492,22 @@ export default class Product extends Vue {
               height 0.3s cubic-bezier(0.65, 0, 0.35, 1);
           }
 
-          &.frame__active {
+          &.frame__active,
+          &.passe__active {
             width: calc(100% - 2 * #{$frameSize});
             height: calc(100% - 2 * #{$frameSize});
           }
-          &.passe__active {
+          &.passe__active.frame__active {
             width: calc(100% - 4 * #{$frameSize});
             height: calc(100% - 4 * #{$frameSize});
           }
           @media (max-width: 768px) and (min-height: 650px) {
-            &.frame__active {
+            &.frame__active,
+            &.passe__active {
               width: calc(100% - 2 * #{$mobileFrameSize});
               height: calc(100% - 2 * #{$mobileFrameSize});
             }
-            &.passe__active {
+            &.passe__active.frame__active {
               width: calc(100% - 4 * #{$mobileFrameSize});
               height: calc(100% - 4 * #{$mobileFrameSize});
             }
@@ -576,11 +517,17 @@ export default class Product extends Vue {
           z-index: 1;
           position: absolute;
           background-color: #cfbeb1;
-          width: calc(100% - 2 * #{$frameSize});
-          height: calc(100% - 2 * #{$frameSize});
-          @media (max-width: 768px) and (min-height: 650px) {
-            width: calc(100% - 2 * #{$mobileFrameSize});
-            height: calc(100% - 2 * #{$mobileFrameSize});
+          width: 100%;
+          height: 100%;
+          transition: width 0.3s cubic-bezier(0.65, 0, 0.35, 1),
+            height 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+          &.frame__active {
+            width: calc(100% - 2 * #{$frameSize});
+            height: calc(100% - 2 * #{$frameSize});
+            @media (max-width: 768px) and (min-height: 650px) {
+              width: calc(100% - 2 * #{$mobileFrameSize});
+              height: calc(100% - 2 * #{$mobileFrameSize});
+            }
           }
         }
         .frame__container {
@@ -682,6 +629,21 @@ export default class Product extends Vue {
             width: 28px;
             height: 28px;
             object-fit: cover;
+            animation: bounce 1.5s infinite cubic-bezier(0.65, 0, 0.35, 1);
+          }
+          @keyframes bounce {
+            0% {
+              transform: translateY(0);
+            }
+            30% {
+              transform: translateY(-8px);
+            }
+            50% {
+              transform: translateY(0px);
+            }
+            100% {
+              transform: translateY(0px);
+            }
           }
           p {
             font-size: 0.6rem;
@@ -861,6 +823,11 @@ export default class Product extends Vue {
               font-size: 1rem;
             }
           }
+        }
+
+        .product__image--wrapper {
+          transform: scale(2);
+          max-width: 50%;
         }
 
         .creator__container {
