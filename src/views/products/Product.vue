@@ -12,7 +12,37 @@
                 ')'
             }"
             ref="background"
-          ></div>
+          >
+            <div
+              class="product__info--container"
+              :class="{ active: productInfo && !isCreatorActive }"
+            >
+              <div class="product__info--content">
+                <img :src="availabilityIconSource(true, darkMode)" alt="" />
+                <p>{{ true ? "dostępny" : "niedostępny" }}</p>
+              </div>
+              <div class="product__info--content">
+                <button
+                  type="button"
+                  class="creatorButton dark"
+                  @click="startCreator"
+                >
+                  Uruchom wizualizator
+                </button>
+              </div>
+              <div class="product__info--content">
+                <img
+                  :src="
+                    require(darkMode
+                      ? '@/assets/images/icons/printerBlack.png'
+                      : '@/assets/images/icons/printerWhite.png')
+                  "
+                  alt="printer"
+                />
+                <p>Zamów reprodukcję</p>
+              </div>
+            </div>
+          </div>
           <div
             class="product__image--wrapper"
             :class="dimensions(product.image.fields.file.details.image)"
@@ -65,7 +95,6 @@
           <div
             class="product__description"
             :class="{ active: productDescription }"
-            @click="startCreator"
           >
             <h2>{{ product.title }}</h2>
             <h4>Numer katalogowy: {{ product.catalogId }}</h4>
@@ -255,6 +284,7 @@ export default class Product extends Vue {
 
   displayScrollIndicator = true;
   productDescription = false;
+  productInfo = false;
   isActive = false;
 
   created() {
@@ -284,9 +314,8 @@ export default class Product extends Vue {
   scrollAnimation() {
     const verticalMobile = window.matchMedia("(max-width: 450px)");
 
-    // const verticalBiggerScreen = window.matchMedia(
-    //   "(min-width: 768px) and (orientation: portrait)"
-    // );
+    // const imageWrapper = document.querySelector(".product__image--wrapper");
+    // const verticalBiggerScreen = window.matchMedia("(min-width: 768px)");
 
     gsap.set(".product__background", {
       transformOrigin: "center 25%",
@@ -301,8 +330,6 @@ export default class Product extends Vue {
         pin: ".product__content"
       },
       scale: 0.2
-      // width: verticalBiggerScreen ? "50%" : "auto",
-      // height: verticalBiggerScreen ? "100vh" : "auto"
     });
 
     gsap.to(".product__background", {
@@ -314,9 +341,11 @@ export default class Product extends Vue {
           className: "inactive"
         },
         onUpdate: ({ progress }) => {
+          console.log(progress);
           const scrollThreshold = 0.05;
           const navThreshold = verticalMobile.matches ? 0.8 : 0.6;
           const descThreshold = verticalMobile.matches ? 0.8 : 0.85;
+          const productInfoThreshold = verticalMobile.matches ? 0.85 : 0.9;
 
           if (progress >= scrollThreshold && this.displayScrollIndicator) {
             this.displayScrollIndicator = false;
@@ -337,6 +366,12 @@ export default class Product extends Vue {
             this.productDescription = true;
           } else if (progress < descThreshold && this.productDescription) {
             this.productDescription = false;
+          }
+
+          if (progress >= productInfoThreshold && !this.productInfo) {
+            this.productInfo = true;
+          } else if (progress < productInfoThreshold && this.productInfo) {
+            this.productInfo = false;
           }
         },
         scrub: 0.4,
@@ -381,6 +416,18 @@ export default class Product extends Vue {
   dimensions(image: { width: number; height: number }) {
     return image.width > image.height ? "horizontal" : "vertical";
   }
+
+  availabilityIconSource(isAvailable: boolean, darkMode: boolean) {
+    if (isAvailable)
+      return darkMode
+        ? require("../../assets/images/icons/availableWhite.png")
+        : require("../../assets/images/icons/availableBlack.png");
+    else
+      return darkMode
+        ? require("../../assets/images/icons/unavailableWhite.png")
+        : require("../../assets/images/icons/unavailableBlack.png");
+  }
+
   get currentWork() {
     return this.$store.getters.currentWork;
   }
@@ -462,9 +509,43 @@ export default class Product extends Vue {
         height: 100%;
         @include backgroundDefault;
         background-image: url("../../assets/images/walls/wall1.jpg");
+        position: relative;
         .product__image--container {
           width: 100%;
           height: 100vh;
+        }
+        .product__info--container {
+          position: absolute;
+          bottom: -$verticalPadding * 3 / 2;
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-top: $verticalPadding / 3;
+          opacity: 0;
+          transition: opacity 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+          &.active {
+            opacity: 1;
+          }
+          .product__info--content {
+            flex: 1;
+            @include flex;
+            flex-direction: row;
+            &:first-of-type {
+              justify-content: flex-start;
+            }
+            &:last-of-type {
+              justify-content: flex-end;
+            }
+            img {
+              width: 32px;
+              height: 32px;
+            }
+            p {
+              font-size: 1.5rem;
+              margin-left: 1rem;
+            }
+          }
         }
       }
       .product__image--wrapper {
@@ -479,7 +560,6 @@ export default class Product extends Vue {
         transform-origin: center 25%;
         transition: background-color 0.15s linear 0.3s;
         &.vertical {
-          // margin: 0 auto;
         }
         .product__image {
           z-index: 2;
@@ -629,6 +709,8 @@ export default class Product extends Vue {
             width: 28px;
             height: 28px;
             object-fit: cover;
+            -webkit-animation: bounce 1.5s infinite
+              cubic-bezier(0.65, 0, 0.35, 1);
             animation: bounce 1.5s infinite cubic-bezier(0.65, 0, 0.35, 1);
           }
           @keyframes bounce {
@@ -645,6 +727,22 @@ export default class Product extends Vue {
               transform: translateY(0px);
             }
           }
+
+          @-webkit-keyframes bounce {
+            0% {
+              transform: translateY(0);
+            }
+            30% {
+              transform: translateY(-8px);
+            }
+            50% {
+              transform: translateY(0px);
+            }
+            100% {
+              transform: translateY(0px);
+            }
+          }
+
           p {
             font-size: 0.6rem;
             font-weight: 600;
@@ -798,6 +896,15 @@ export default class Product extends Vue {
           }
           h4 {
             font-size: 1.5rem;
+          }
+        }
+        .product__image--wrapper.vertical {
+          max-width: 100%;
+          @media (min-width: 960px) {
+            max-width: 40%;
+          }
+          @media (min-width: 1024px) {
+            max-width: 35%;
           }
         }
       }

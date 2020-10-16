@@ -154,7 +154,7 @@ export default class Slider extends Vue {
             width: 100%;
             height: 70%;
             max-height: 70%;
-            object-fit: fill;
+            object-fit: cover;
           }
           .swiper__description {
             width: 100%;
